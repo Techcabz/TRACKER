@@ -1,9 +1,9 @@
 <script setup>
 import { useAuthStore } from '@/stores/auth';
-import { reactive } from 'vue';
+import { reactive , ref} from 'vue';
 
 const authStore = useAuthStore()
-
+const pageTitle = ref("Register");
 const formData = reactive({
     name: '',
     email: '',
@@ -11,10 +11,11 @@ const formData = reactive({
     password_confirmation: ''
 })
 
+
 </script>
 
 <template>
-  <main>
+  <main :pageTitle="pageTitle">
     <h1 class="title">Register a new account {{ authStore.userAge  }}</h1>
     <form @submit.prevent="console.log(formData)" class="w-1/2 mx-auto space-y-6">
       <div>

@@ -1,4 +1,7 @@
-import './assets/main.css'
+
+import './assets/css/satoshi.css'
+import './assets/css/main.css'
+
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
