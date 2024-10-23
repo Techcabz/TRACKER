@@ -41,11 +41,35 @@ const routes = [
     component: AdminLayout,
     children: [
       {
-        path: "",
+        path: "/admin",
         name: "admin-dashboard",
         component: HomeView,
         meta: {
           title: "| DASHBOARD",
+        },
+      },
+      {
+        path: "/documents",
+        name: "admin-documents",
+        component: HomeView,
+        meta: {
+          title: "| DOCUMENTS",
+        },
+      },
+      {
+        path: "/profile",
+        name: "admin-profile",
+        component: HomeView,
+        meta: {
+          title: "| PROFILE",
+        },
+      },
+      {
+        path: "/pages/settings",
+        name: "admin-settings",
+        component: HomeView,
+        meta: {
+          title: "| SETTINGS",
         },
       },
     ],

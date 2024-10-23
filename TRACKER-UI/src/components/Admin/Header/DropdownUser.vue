@@ -27,9 +27,9 @@ onClickOutside(target, () => {
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
-          viewBox="0 0 24 24"
+          viewBox="0 0 25 25"
           strokeWidth="{1.5}"
-          stroke="currentColor"
+          stroke="white"
           className="size-6"
         >
           <path
@@ -44,11 +44,11 @@ onClickOutside(target, () => {
 
       <svg
         :class="dropdownOpen && 'rotate-180'"
-        class="hidden fill-current sm:block"
+        class="hidden sm:block"
         width="12"
         height="8"
         viewBox="0 0 12 8"
-        fill="none"
+        fill="white"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
@@ -63,7 +63,7 @@ onClickOutside(target, () => {
     <!-- Dropdown Start -->
     <div
       v-show="dropdownOpen"
-      class="absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark"
+      class="absolute right-0 mt-2 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark"
     >
       <ul
         class="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark"
@@ -71,7 +71,7 @@ onClickOutside(target, () => {
         <li>
           <router-link
             to="/profile"
-            class="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+            class="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-darkgray lg:text-base"
           >
             <svg
               class="fill-current"
@@ -93,11 +93,11 @@ onClickOutside(target, () => {
             My Profile
           </router-link>
         </li>
-      
+
         <li>
           <router-link
             to="/pages/settings"
-            class="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+            class="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-darkgray lg:text-base"
           >
             <svg
               class="fill-current"
@@ -121,7 +121,7 @@ onClickOutside(target, () => {
         </li>
       </ul>
       <button
-        class="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+        class="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-darkgray lg:text-base"
       >
         <svg
           class="fill-current"
