@@ -1,0 +1,22 @@
+.dropzone {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s ease;
+  }
+  
+  .dropzone:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .dropzone.drag-active {
+    background-color: #e6f7ff;
+  }
+  
+  .dropzone input[type="file"] {
+    display: none;
+  }
+  
