@@ -1,15 +1,14 @@
 
 ## General
-.Run git clone
+Run git clone
 ## About Laravel
 
-2.Run composer install
-3.Run cp .env.example .env
-4.Configure for database name and smpt credentials in .env
-5.Run php artisan key:generate
-6.Run php artisan migrate
-8.Run php artisan serve
-9.Go to link localhost:8000
+1. Run composer install
+2. Run cp .env.example .env
+3. Configure for database name and smpt credentials in .env
+4. Run php artisan key:generate
+5. Run php artisan migrate
+6. Run php artisan serve
 ## Laravel END
 
 
