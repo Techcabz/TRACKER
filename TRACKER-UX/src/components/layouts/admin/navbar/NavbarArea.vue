@@ -72,10 +72,10 @@ const logout = async () => {
       <p v-else class="text-grass12  font-bold uppercase">Guest</p>
 
     </div>
-    <Button variant="secondary" size="icon" class="ml-auto h-8 w-8 rounded">
+    <!-- <Button variant="secondary" size="icon" class="ml-auto h-8 w-8 rounded">
       <Bell class="h-5 w-5" />
       <span class="sr-only">Toggle notifications</span>
-    </Button>
+    </Button> -->
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
         <Button variant="secondary" size="icon" class="rounded-full">
@@ -87,7 +87,7 @@ const logout = async () => {
         <DropdownMenuLabel class="text-grass12">My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem >
-          <router-link  :to="{ name: 'dashboard' }" class=" ml-2 leading-none outline-none flex items-center justify-end">
+          <router-link  :to="{ name: 'settings' }" class=" ml-2 leading-none outline-none flex items-center justify-end">
             Settings
           </router-link>
         </DropdownMenuItem>

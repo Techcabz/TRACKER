@@ -1,3 +1,4 @@
+import { roleAccess } from "@/config/roleAccess";
 import { defineStore } from "pinia";
 
 // Define the structure of the User and AuthState interfaces
@@ -5,20 +6,34 @@ interface User {
   id: number;
   name: string;
   email: string;
+  role: string;
   [key: string]: any;
 }
 
 interface AuthState {
   user: User | null;
   errors: Record<string, string[]>;
+  userRole: string;
 }
 
 export const useAuthStore = defineStore("authStore", {
   state: (): AuthState => ({
     user: null,
     errors: {},
+    userRole: localStorage.getItem("userRole") || "guest", // Initialize userRole from localStorage
   }),
-
+  getters: {
+    isAuthenticated(): boolean {
+      return this.user !== null;
+    },
+    userRoleGetter(): string {
+      // Getter for userRole
+      return this.user?.role || this.userRole;
+    },
+    accessibleRoutes(): string[] {
+      return roleAccess[this.userRole] || [];
+    },
+  },
   actions: {
     async getUser(): Promise<void> {
       const token = localStorage.getItem("token");
@@ -31,11 +46,21 @@ export const useAuthStore = defineStore("authStore", {
 
         const data = await res.json();
         if (res.ok) {
-          this.user = data;
-        }
-        console.log(data);
+          this.user = {
+            ...data,
+            role: data.role_as, // Ensure the API response includes the role
+          };
 
-        
+          this.userRole = data.role_as === 1 ? "admin" : "user"; // Set the userRole in the state
+
+         
+          // Persist userRole in localStorage
+          localStorage.setItem("userRole", this.userRole);
+        } else {
+          this.user = null;
+          this.userRole = "guest"; // Default to guest if no valid user found
+          localStorage.setItem("userRole", "guest"); // Persist "guest" in localStorage
+        }
       }
     },
 
@@ -57,7 +82,15 @@ export const useAuthStore = defineStore("authStore", {
       } else {
         this.errors = {};
         localStorage.setItem("token", data.token);
-        this.user = data.user;
+
+        this.user = {
+          ...data.user,
+          role: data.role_as, // Assuming this comes from your backend as role_as
+        };
+        this.userRole = data.role_as === 1 ? "admin" : "user"; // Set the userRole based on API response
+        console.log(this.userRole);
+        // Persist userRole in localStorage
+        localStorage.setItem("userRole", this.userRole);
 
         // Make sure to access the router with `this.$router`
         if (this.router) {
@@ -83,6 +116,7 @@ export const useAuthStore = defineStore("authStore", {
           this.user = null;
           this.errors = {};
           localStorage.removeItem("token");
+          localStorage.removeItem("userRole"); // Remove userRole from localStorage on logout
           this.router.push({ name: "login" });
         }
       }

@@ -21,7 +21,6 @@ import { Label } from "../../components/ui/label";
 const authStore = useAuthStore();
 const { errors } = storeToRefs(authStore);
 const { toast } = useToast()
-console.log(toast);
 
 const login = async () => {
   try {
@@ -61,7 +60,7 @@ const formData = reactive<FormData>({
       <form @submit.prevent="login">
         <div class="grid gap-4">
           <div class="grid gap-2">
-            <Label for="email">Email</Label>
+            <Label for="email">Email or Username</Label>
             <Input type="text" placeholder="username or email" v-model="formData.login" required />
             <p v-if="errors.email" class="errors">
               {{ errors.email[0] }}

@@ -11,9 +11,12 @@
   "dependencies": {
     "@radix-icons/vue": "^1.0.0",
     "@radix-ui/colors": "^3.0.0",
+    "@tanstack/vue-table": "^8.20.5",
     "@vueuse/core": "^11.3.0",
+    "axios": "^1.7.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "compressorjs": "^1.2.1",
     "dropzone": "^6.0.0-beta.2",
     "lucide-vue-next": "^0.460.0",
     "pinia": "^2.2.6",

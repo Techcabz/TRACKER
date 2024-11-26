@@ -5,7 +5,7 @@ import SidebarItems from "./SidebarItems.vue";
 </script>
 
 <template>
-  <div class="flex h-15 items-center  border-b bg-grass11 text-white px-4 lg:h-[60px] lg:px-6">
+  <div class="flex h-15 items-center  border-b  px-4 lg:h-[60px] lg:px-6">
     <a href="/" class="flex items-center gap-2 font-semibold">
       <Package2 class="h-6 w-6" />
       <span class="">DOCUMENT-TRACKER</span>
@@ -15,7 +15,7 @@ import SidebarItems from "./SidebarItems.vue";
       <span class="sr-only">Toggle notifications</span>
     </Button> -->
   </div>
-  <div class="flex-1 bg-grass5 text-black">
+  <div class="flex-1  text-black">
     <!-- Links -->
      <SidebarItems />
   </div>

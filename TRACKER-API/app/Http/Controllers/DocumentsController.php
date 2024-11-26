@@ -32,35 +32,25 @@ class DocumentsController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
+        \Log::info($request->all()); // Log all incoming data
+        \Log::info($request->file('file')); // Log the file details
 
-        // $fields = $request->validate([
-        //     'name' => 'required|max:255',
-        //     'category' => 'required|max:255',
-        //     'file' => 'required|file|mimes:png,jpg,jpeg,pdf|max:2048',
-        // ]);
+        $fields = $request->validate([
+            'name' => 'required|max:255',
+            'category' => 'required|max:255',
 
-        // $filePath = $request->file('file')->store('documents', 'public');
+        ]);
 
-        // $document = new Documents();
-        // $document->name = $fields['name'];
-        // $document->category = $fields['category'];
-        // $document->file_path = "xx";
-        // // $document->owner_id = auth()->id();
-        // $document->save();
+        $filePath = $request->file('file')->store('documents', 'public');
 
-        // Log all incoming request data
-        \Log::info('Request data:', $request->all());
+        $document = new Documents();
+        $document->name = $fields['name'];
+        $document->status = 1;
+        $document->category = $fields['category'];
+        $document->file_path = "xxxx";
+        $document->owner_id = auth()->id();
+        $document->save();
 
-        // Log file information
-        if ($request->hasFile('file')) {
-            \Log::info('File Info:', [
-                'Original Name' => $request->file('file')->getClientOriginalName(),
-                'Size' => $request->file('file')->getSize(),
-                'Mime Type' => $request->file('file')->getMimeType(),
-            ]);
-        } else {
-            \Log::error('File not received.');
-        }
 
         return response()->json(['message' => 'Request logged.'], 200);
     }

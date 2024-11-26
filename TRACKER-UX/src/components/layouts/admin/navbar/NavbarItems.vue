@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Home, ScrollText } from "lucide-vue-next";
 import { Badge } from "@/components/ui/badge";
-
 </script>
 
 <template>
@@ -26,51 +25,11 @@ import { Badge } from "@/components/ui/badge";
     >
       <ScrollText class="h-4 w-4" />
       Documents
-      <Badge
+      <!-- <Badge
         class="ml-auto flex h-6 w-6 shrink-0 bg-white text-black items-center justify-center rounded-full"
       >
         0
-      </Badge>
+      </Badge> -->
     </router-link>
-    <!-- <SidebarContent>
-      <SidebarGroup>
-        <SidebarGroupLabel>Platform</SidebarGroupLabel>
-        <SidebarMenu>
-          <Collapsible
-            v-for="item in data.navMain"
-            :key="item.title"
-            as-child
-            :default-open="item.isActive"
-            class="group/collapsible"
-          >
-            <SidebarMenuItem>
-              <CollapsibleTrigger as-child>
-                <SidebarMenuButton :tooltip="item.title">
-                  <component :is="item.icon" />
-                  <span>{{ item.title }}</span>
-                  <ChevronRight
-                    class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
-                  />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  <SidebarMenuSubItem
-                    v-for="subItem in item.items"
-                    :key="subItem.title"
-                  >
-                    <SidebarMenuSubButton as-child>
-                      <a :href="subItem.url">
-                        <span>{{ subItem.title }}</span>
-                      </a>
-                    </SidebarMenuSubButton>
-                  </SidebarMenuSubItem>
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
-        </SidebarMenu>
-      </SidebarGroup>
-    </SidebarContent> -->
   </nav>
 </template>

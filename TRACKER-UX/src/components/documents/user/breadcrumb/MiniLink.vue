@@ -14,7 +14,11 @@ import {
     <Breadcrumb class="hidden md:flex">
       <BreadcrumbList>
         <BreadcrumbItem class="hidden md:block">
-          <BreadcrumbLink href="#"> Dashboard </BreadcrumbLink>
+          <BreadcrumbLink>
+            <router-link :to="{ name: 'dashboard' }"
+              >Dashboard</router-link
+            ></BreadcrumbLink
+          >
         </BreadcrumbItem>
         <BreadcrumbSeparator class="hidden md:block" />
         <BreadcrumbItem>
