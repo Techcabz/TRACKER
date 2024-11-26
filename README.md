@@ -15,5 +15,5 @@ Run git clone
 ## About Vue
 1. npm install
 2. npm run dev
-9.Go to link localhost:5173
+3. Go to link localhost:5173
 ## Vue END
