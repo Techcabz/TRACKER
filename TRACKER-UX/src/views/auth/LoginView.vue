@@ -2,7 +2,7 @@
 import { reactive } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
-import { useToast } from '@/components/ui/toast/use-toast'
+import { useToast } from "@/components/ui/toast/use-toast";
 
 // Import UI components
 import { Button } from "../../components/ui/button";
@@ -17,20 +17,27 @@ import {
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 
-// Extract `errors` and `authenticate` from the auth store
 const authStore = useAuthStore();
 const { errors } = storeToRefs(authStore);
-const { toast } = useToast()
+const { toast } = useToast();
 
 const login = async () => {
   try {
+    const res = await authStore.login(formData);
 
-    await authStore.authenticate("login", formData); // Call authenticate action
-    toast({
-      description: `Login successfully.`, class: 'bg-green-500 text-white',
-    });
+    if (res.success) {
+      toast({
+        description: "Login successful.",
+        class: "bg-green-500 text-white",
+      });
+    } else {
+      toast({
+        description: "Login failed. Please check the errors.",
+        class: "bg-red-500 text-white",
+      });
+    }
   } catch (error) {
-    console.error("Authentication failed:", error);
+    console.error("Login failed:", error);
   }
 };
 
@@ -46,7 +53,6 @@ const formData = reactive<FormData>({
 </script>
 
 <template>
-
   <Card class="mx-auto max-w-sm mt-12">
     <CardHeader>
       <CardTitle class="text-2xl">Login</CardTitle>
@@ -55,15 +61,18 @@ const formData = reactive<FormData>({
       </CardDescription>
     </CardHeader>
     <CardContent>
-
-
       <form @submit.prevent="login">
         <div class="grid gap-4">
           <div class="grid gap-2">
             <Label for="email">Email or Username</Label>
-            <Input type="text" placeholder="username or email" v-model="formData.login" required />
-            <p v-if="errors.email" class="errors">
-              {{ errors.email[0] }}
+            <Input
+              type="text"
+              placeholder="username or email"
+              v-model="formData.login"
+              required
+            />
+            <p v-if="errors.login" class="errors">
+              {{ errors.login[0] }}
             </p>
           </div>
           <div class="grid gap-2">
@@ -73,13 +82,20 @@ const formData = reactive<FormData>({
                 Forgot your password?
               </a>
             </div>
-            <Input id="password" type="password" v-model="formData.password" required />
+            <Input
+              id="password"
+              type="password"
+              v-model="formData.password"
+              required
+            />
             <p v-if="errors.password" class="errors">
               {{ errors.password[0] }}
             </p>
           </div>
-          <Button type="submit"
-            class="w-full bg-grass11 gap-1 text-white rounded hover:bg-grass11 focus:ring-2 focus:ring-grass11 focus:ring-offset-2 focus:outline-none ">
+          <Button
+            type="submit"
+            class="w-full bg-grass11 gap-1 text-white rounded hover:bg-grass11 focus:ring-2 focus:ring-grass11 focus:ring-offset-2 focus:outline-none"
+          >
             Login
           </Button>
         </div>

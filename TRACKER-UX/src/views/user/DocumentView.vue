@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import MiniLink from "@/components/documents/user/breadcrumb/MiniLink.vue";
 import DocuDialog from "@/components/documents/user/dialog/DocuDialog.vue";
 import DocumentFilter from "@/components/documents/user/filters/DocumentFilter.vue";
 import DocuUpload from "@/components/documents/user/form/DocuUpload.vue";
@@ -11,6 +10,7 @@ import AdminLayouts from "@/layouts/AdminLayouts.vue";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DocuTables from "@/components/documents/tables/DocuTables.vue";
 import DocuHistory from "@/components/documents/user/tables/DocuHistory.vue";
+import MiniLink from "@/components/general/breadcrumb/MiniLink.vue";
 </script>
 
 <template>

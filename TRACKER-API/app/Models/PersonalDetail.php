@@ -8,8 +8,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PersonalDetail extends Model
 {
 
-    public function user(): BelongsTo
+    protected $table = 'personal_details';
+
+
+    protected $fillable = [
+        'users_id',
+        'firstname',
+        'lastname',
+        'middlename',
+        'position',
+    ];
+
+    public function personal_details(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'users_id', 'id');
     }
 }

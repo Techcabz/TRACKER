@@ -7,6 +7,11 @@ interface User {
   name: string;
   email: string;
   role: string;
+  personalDetails?: {
+    firstname: string;
+    lastname: string;
+    position: string;
+  };
   [key: string]: any;
 }
 
@@ -20,7 +25,7 @@ export const useAuthStore = defineStore("authStore", {
   state: (): AuthState => ({
     user: null,
     errors: {},
-    userRole: localStorage.getItem("userRole") || "guest", // Initialize userRole from localStorage
+    userRole: localStorage.getItem("userRole") || "guest",
   }),
   getters: {
     isAuthenticated(): boolean {
@@ -47,20 +52,22 @@ export const useAuthStore = defineStore("authStore", {
           });
 
           const data = await res.json();
+
           if (res.ok) {
             this.user = {
               ...data,
-              role: data.role_as, // Ensure the API response includes the role
+              role: data.role_as,
+              personalDetails: data.personal_details.length > 0 ? data.personal_details[0] : null, 
             };
 
-            this.userRole = data.role_as === 1 ? "admin" : "user"; // Set the userRole in the state
+            this.userRole = data.role_as === 1 ? "admin" : "user";
 
             // Persist userRole in localStorage
             localStorage.setItem("userRole", this.userRole);
           } else {
             this.user = null;
-            this.userRole = "guest"; // Default to guest if no valid user found
-            localStorage.setItem("userRole", "guest"); // Persist "guest" in localStorage
+            this.userRole = "guest";
+            localStorage.setItem("userRole", "guest");
           }
         }
       } catch (error) {
@@ -73,7 +80,7 @@ export const useAuthStore = defineStore("authStore", {
     async authenticate(
       apiRoute: string,
       formData: Record<string, any>
-    ): Promise<void> {
+    ): Promise<{ success: boolean; errors?: Record<string, any> }> {
       const res = await fetch(`/api/${apiRoute}`, {
         method: "POST",
         headers: {
@@ -83,25 +90,106 @@ export const useAuthStore = defineStore("authStore", {
       });
 
       const data = await res.json();
+
       if (data.errors) {
         this.errors = data.errors;
+        return { success: false, errors: data.errors }; // Return error details
       } else {
         this.errors = {};
         localStorage.setItem("token", data.token);
 
         this.user = {
           ...data.user,
-          role: data.role_as, // Assuming this comes from your backend as role_as
+          role: data.role_as,
+          personalDetails: data.personal_details.length > 0 ? data.personal_details[0] : null, 
         };
-        this.userRole = data.role_as === 1 ? "admin" : "user"; // Set the userRole based on API response
-        console.log(this.userRole);
+        this.userRole = data.role_as === 1 ? "admin" : "user";
+
         // Persist userRole in localStorage
         localStorage.setItem("userRole", this.userRole);
 
-        // Make sure to access the router with `this.$router`
+        // Redirect to dashboard if the authentication is successful
         if (this.router) {
           this.router.push({ name: "dashboard" });
         }
+
+        return { success: true }; // Return success flag
+      }
+    },
+    async login(
+      formData: Record<string, any>
+    ): Promise<{ success: boolean; errors?: Record<string, any> }> {
+      const res = await fetch(`/api/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (data.errors) {
+        this.errors = data.errors;
+        return { success: false, errors: data.errors }; // Return error details
+      } else {
+        this.errors = {};
+        localStorage.setItem("token", data.token);
+
+        this.user = {
+          ...data.user,
+          role: data.role_as,
+          
+        };
+        this.userRole = data.role_as === 1 ? "admin" : "user";
+
+        // Persist userRole in localStorage
+        localStorage.setItem("userRole", this.userRole);
+
+        // Redirect to dashboard after successful login
+        if (this.router) {
+          this.router.push({ name: "dashboard" });
+        }
+
+        return { success: true }; // Return success flag
+      }
+    },
+
+    async register(
+      formData: Record<string, any>
+    ): Promise<{ success: boolean; errors?: Record<string, any> }> {
+      const res = await fetch(`/api/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (data.errors) {
+        this.errors = data.errors;
+        return { success: false, errors: data.errors }; // Return error details
+      } else {
+        this.errors = {};
+        localStorage.setItem("token", data.token);
+
+        this.user = {
+          ...data.user,
+          role: data.role_as,
+        };
+        this.userRole = data.role_as === 1 ? "admin" : "user";
+
+        // Persist userRole in localStorage
+        localStorage.setItem("userRole", this.userRole);
+
+        // Redirect to login after successful registration
+        if (this.router) {
+          this.router.push({ name: "login" });
+        }
+
+        return { success: true }; // Return success flag
       }
     },
 
@@ -116,7 +204,7 @@ export const useAuthStore = defineStore("authStore", {
         });
 
         const data = await res.json();
-       
+
         if (res.ok) {
           this.user = null;
           this.errors = {};

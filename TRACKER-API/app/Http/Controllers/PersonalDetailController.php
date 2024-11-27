@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PersonalDetail;
 use Illuminate\Http\Request;
+use App\Models\PersonalDetail;
+
 
 class PersonalDetailController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+
+
     public function index()
     {
-        //
+
     }
 
     /**

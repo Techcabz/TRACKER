@@ -8,6 +8,7 @@ import DocumentMgtView from "@/views/admin/DocumentMgtView.vue";
 import { useAuthStore } from "@/stores/auth";
 import SettingView from "@/views/admin/SettingView.vue";
 import { roleAccess } from "@/config/roleAccess";
+import UserView from "@/views/admin/UserView.vue";
 
 const isLoggedIn = (): boolean => {
   return localStorage.getItem("token") !== null; // Replace with actual logic
@@ -24,31 +25,31 @@ const routes: Array<RouteRecordRaw> = [
     path: "/dashboard",
     name: "dashboard",
     component: DashboardView,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, breadcrumb: "Dashboard" },
   },
   {
     path: "/document",
     name: "document",
     component: DocumentMgtView,
-    meta: { requiresAuth: false },
+    meta: { requiresAuth: false, breadcrumb: "Document" },
   },
   {
     path: "/documents",
     name: "documents",
     component: DocumentView,
-    meta: { requiresAuth: false },
+    meta: { requiresAuth: false, breadcrumb: "Documents" },
   },
   {
     path: "/users",
     name: "users",
-    component: SettingView,
-    meta: { requiresAuth: false },
+    component: UserView,
+    meta: { requiresAuth: false, breadcrumb: "Users" },
   },
   {
     path: "/settings",
     name: "settings",
     component: SettingView,
-    meta: { requiresAuth: false },
+    meta: { requiresAuth: false, breadcrumb: "Settings" },
   },
   {
     path: "/login",
@@ -100,6 +101,5 @@ router.beforeEach(async (to, from, next) => {
 
   next();
 });
-
 
 export default router;

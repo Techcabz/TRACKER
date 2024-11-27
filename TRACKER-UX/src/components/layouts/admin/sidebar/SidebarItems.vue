@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Home, ScrollText, Users } from "lucide-vue-next";
+import { Home, ScrollText, Users, Settings } from "lucide-vue-next";
 import { computed, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useRoute } from "vue-router";
@@ -78,8 +78,20 @@ const isActive = (routeName: string) => route.name === routeName;
         'text-muted-foreground hover:text-primary': !isActive('users'),
       }"
     >
-      <Users  class="h-4 w-4" />
+      <Users class="h-4 w-4" />
       Users Mgt.
+    </router-link>
+
+    <router-link
+      :to="{ name: 'settings' }"
+      class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
+      :class="{
+        'bg-muted text-primary': isActive('settings'),
+        'text-muted-foreground hover:text-primary': !isActive('users'),
+      }"
+    >
+      <Settings class="h-4 w-4" />
+      Settings
     </router-link>
   </nav>
 </template>

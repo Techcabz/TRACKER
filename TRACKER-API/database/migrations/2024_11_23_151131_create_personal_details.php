@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string("firstname");
             $table->string("lastname");
-            $table->string("middlename");
-            $table->string("position");
+            $table->string("middlename")->nullable();
+            $table->string("position")->nullable();
+            $table->foreignId('users_id')->constrained()->onDelete('cascade');
+
             $table->timestamps();
         });
     }
