@@ -172,8 +172,8 @@ const table = useVueTable({
       <Input
         class="max-w-sm"
         placeholder="Filter documents..."
-        :model-value="table.getColumn('email')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('email')?.setFilterValue($event)"
+        :model-value="table.getColumn('name')?.getFilterValue() as string"
+        @update:model-value="table.getColumn('name')?.setFilterValue($event)"
       />
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
