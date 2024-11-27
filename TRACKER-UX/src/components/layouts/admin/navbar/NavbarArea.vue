@@ -58,7 +58,7 @@ const logout = async () => {
           <span class="sr-only">Toggle navigation menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" class="flex flex-col bg-muted/40 text-white">
+      <SheetContent side="left" class="flex flex-col bg-white ">
         <!-- Link Items -->
         <NavbarItems />
       </SheetContent>

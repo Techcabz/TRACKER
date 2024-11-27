@@ -37,30 +37,36 @@ export const useAuthStore = defineStore("authStore", {
   actions: {
     async getUser(): Promise<void> {
       const token = localStorage.getItem("token");
-      if (token) {
-        const res = await fetch("/api/user", {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        });
+      this.loading = true;
+      try {
+        if (token) {
+          const res = await fetch("/api/user", {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+          });
 
-        const data = await res.json();
-        if (res.ok) {
-          this.user = {
-            ...data,
-            role: data.role_as, // Ensure the API response includes the role
-          };
+          const data = await res.json();
+          if (res.ok) {
+            this.user = {
+              ...data,
+              role: data.role_as, // Ensure the API response includes the role
+            };
 
-          this.userRole = data.role_as === 1 ? "admin" : "user"; // Set the userRole in the state
+            this.userRole = data.role_as === 1 ? "admin" : "user"; // Set the userRole in the state
 
-         
-          // Persist userRole in localStorage
-          localStorage.setItem("userRole", this.userRole);
-        } else {
-          this.user = null;
-          this.userRole = "guest"; // Default to guest if no valid user found
-          localStorage.setItem("userRole", "guest"); // Persist "guest" in localStorage
+            // Persist userRole in localStorage
+            localStorage.setItem("userRole", this.userRole);
+          } else {
+            this.user = null;
+            this.userRole = "guest"; // Default to guest if no valid user found
+            localStorage.setItem("userRole", "guest"); // Persist "guest" in localStorage
+          }
         }
+      } catch (error) {
+        console.error("Failed to fetch user data", error);
+      } finally {
+        this.loading = false;
       }
     },
 
@@ -110,13 +116,14 @@ export const useAuthStore = defineStore("authStore", {
         });
 
         const data = await res.json();
-        console.log(data);
-
+       
         if (res.ok) {
           this.user = null;
           this.errors = {};
           localStorage.removeItem("token");
           localStorage.removeItem("userRole"); // Remove userRole from localStorage on logout
+          console.log(data);
+
           this.router.push({ name: "login" });
         }
       }

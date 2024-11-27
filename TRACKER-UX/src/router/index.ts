@@ -73,31 +73,33 @@ router.beforeEach(async (to, from, next) => {
   const loggedIn = isLoggedIn();
   const authStore = useAuthStore();
 
-  // Ensure user info is fetched
-  await authStore.getUser();
+  // Skip checks for the login route or when explicitly navigating to it
+  if (to.name === "login") {
+    return next();
+  }
 
-  // If the route requires authentication and the user is not logged in
+  // Ensure user info is fetched if logged in
+  if (loggedIn && !authStore.user) {
+    await authStore.getUser();
+  }
+
   if (to.meta.requiresAuth && !loggedIn) {
     return next({ name: "login" });
   }
 
-  // If the route is guest-only but the user is logged in
   if (to.meta.guestOnly && loggedIn) {
     return next({ name: "dashboard" });
   }
 
-  // Get the user's role from the store
   const userRole = authStore.userRole;
-
-  // Check if the route is accessible based on the user's role
   const allowedRoutes = roleAccess[userRole] || [];
-  console.log(allowedRoutes);
-  // If the route name is not in the allowed routes for the current user role
+
   if (!allowedRoutes.includes(to.name as string)) {
-    return next({ name: "dashboard" }); // Redirect to a default page if not authorized
+    return next({ name: "dashboard" });
   }
 
-  next(); // Proceed with navigation if all checks pass
+  next();
 });
+
 
 export default router;
