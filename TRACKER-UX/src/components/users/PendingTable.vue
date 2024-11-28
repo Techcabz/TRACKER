@@ -224,18 +224,17 @@ const table = useVueTable({
   <CustomDialog
     v-model:open="isDialogOpen"
     title="User Information"
-   description="Review and approve pending user details."
+    description="Review and approve pending user details."
     closeText="Cancel"
     saveText="Approved"
   >
     <template #default>
       <div v-if="selectedUser">
-        <PendingForm :selectedUser="selectedUser" />
+        <PendingForm :users="users" :selectedUser="selectedUser" />
       </div>
       <div v-else>
         <p>No user selected.</p>
       </div>
-      
     </template>
   </CustomDialog>
 

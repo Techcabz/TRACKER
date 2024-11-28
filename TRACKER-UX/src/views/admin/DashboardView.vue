@@ -59,6 +59,15 @@ const isAdmin = computed(() => {
   }
 });
 
+const isNoTHighUser = computed(() => {
+  if (authStore.user) {
+    return (
+      authStore.user?.personalDetails?.position === "chairman" ||
+      authStore.user?.personalDetails?.position === "dean"
+    );
+  }
+});
+
 onMounted(() => {
   docuStore.fetchDocuments(); // Fetch document data on component mount
 });
@@ -84,7 +93,7 @@ const totalRejected = computed(() => {
 <template>
   <AdminLayouts>
     <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-      <div class="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+      <div class="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4" >
         <!-- Total Pending -->
         <Card>
           <CardHeader

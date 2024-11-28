@@ -25,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import CustomDialog from "@/components/general/dialog/CustomDialog.vue";
 import { useDocuStore } from "@/stores/document";
 import { valueUpdater } from "@/utils";
 import { CaretSortIcon, ChevronDownIcon } from "@radix-icons/vue";
@@ -38,6 +39,7 @@ import {
   useVueTable,
 } from "@tanstack/vue-table";
 import { h, ref, onMounted, computed } from "vue";
+import StatusPage from "../status/StatusPage.vue";
 
 const docuStore = useDocuStore();
 const document = ref(docuStore.document);
@@ -57,6 +59,7 @@ export interface Documents {
 const statusMap = {
   1: "Pending",
   0: "Success",
+  4: "InProgress",
   2: "Processing",
   3: "Failed",
 };
@@ -64,6 +67,7 @@ const statusMap = {
 const statusBadgeMap = {
   Pending: "default",
   Success: "secondary",
+  InProgress: "outline",
   Processing: "outline",
   Failed: "destructive",
 };
@@ -74,6 +78,8 @@ const filteredDocuments = computed(() => {
   );
 });
 
+const isDialogOpen = ref(false);
+const selectedDocuId = ref<string>();
 const data: Documents[] = [...filteredDocuments.value];
 
 const columns: ColumnDef<Documents>[] = [
@@ -135,14 +141,17 @@ const columns: ColumnDef<Documents>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const document = row.original;
+      const document = row.original.id;
       return h(
         Button,
         {
           variant: "outline",
           size: "sm",
           class: "bg-grass11 text-white",
-          onClick: () => console.log("Button clicked for document:", document),
+          onClick: () => {
+            selectedDocuId.value = document;
+            isDialogOpen.value = true;
+          },
         },
         () => "View"
       );
@@ -193,6 +202,23 @@ const table = useVueTable({
 </script>
 
 <template>
+  <CustomDialog
+    v-model:open="isDialogOpen"
+    title="Document Information"
+    description="Information about documents with a status"
+    closeText="Cancel"
+    saveText="Approved"
+  >
+    <template #default>
+      <div v-if="filteredDocuments">
+        <StatusPage />
+      </div>
+      <div v-else>
+        <p>No user selected.</p>
+      </div>
+    </template>
+  </CustomDialog>
+
   <div class="w-full">
     <div class="flex items-center py-4">
       <Input

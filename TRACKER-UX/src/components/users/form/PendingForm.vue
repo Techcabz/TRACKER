@@ -65,6 +65,8 @@ const approveUser = async () => {
           description: "User approved successfully.",
           class: "bg-green-500 text-white",
         });
+     
+       
       } else {
         toast({
           description: "User approval failed. Please check the errors.",

@@ -29,7 +29,7 @@ export const useDocuStore = defineStore("docuStore", {
         }
 
         const data = await response.json();
-        //   console.log(data)
+       
         this.documents = data; // Store the fetched documents in the state
       } catch (error: any) {
         this.errors = error.message || "Failed to fetch documents.";
@@ -49,7 +49,7 @@ export const useDocuStore = defineStore("docuStore", {
         return;
       }
 
-      let id = 1;
+     
       try {
         const userId = authStore.user?.id;
 
@@ -68,7 +68,7 @@ export const useDocuStore = defineStore("docuStore", {
         }
 
         const data = await response.json();
-        console.log(data);
+       
         this.document = data;
       } catch (error: any) {
         this.errors = error.message || "Failed to fetch documents.";

@@ -11,18 +11,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const docuStore = useDocuStore();
 import DocuHistory from "@/components/documents/user/tables/DocuHistory.vue";
 import MiniLink from "@/components/general/breadcrumb/MiniLink.vue";
-
-import { onMounted, ref } from "vue";
-import DocuTables from "@/components/documents/user/tables/DocuTables.vue";
+import { useAuthStore } from "@/stores/auth";
+import { onMounted, ref, computed } from "vue";
+import DocuTables from "@/components/documents/admin/tables/DocuTables.vue";
 const document = ref(docuStore.document);
+const authStore = useAuthStore();
 
 onMounted(async () => {
   // await docuStore.fetchDocuments();
   await docuStore.getDocuments();
+  authStore.getUser();
   document.value = docuStore.document;
 });
 
-console.log(docuStore.document);
+const isNoTHighUser = computed(() => {
+  if (authStore.user) {
+    return (
+      authStore.user?.personalDetails?.position === "chairman" ||
+      authStore.user?.personalDetails?.position === "dean"
+    );
+  }
+});
 </script>
 
 <template>
@@ -35,7 +44,7 @@ console.log(docuStore.document);
         <!-- <Searchbar /> -->
       </div>
       <Separator orientation="horizontal" />
-      <Tabs default-value="upload">
+      <Tabs default-value="upload" v-if="!isNoTHighUser">
         <!-- Filters and Navigation -->
         <div class="flex">
           <div class="md:flex items-center">
@@ -94,6 +103,10 @@ console.log(docuStore.document);
           <DocuHistory />
         </TabsContent>
       </Tabs>
+
+      <div v-else>
+        <DocuTables />
+      </div>
     </div>
   </AdminLayouts>
 </template>
