@@ -40,7 +40,7 @@ import {
   FileClock,
 } from "lucide-vue-next";
 import DocuHistory from "@/components/documents/user/tables/DocuHistory.vue";
-import DocuTables from "@/components/documents/user/tables/DocuTables.vue";
+import RecentTables from "@/components/documents/user/tables/RecentTables.vue";
 import { onMounted, computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useDocuStore } from "@/stores/document";
@@ -151,7 +151,7 @@ const totalRejected = computed(() => {
             </Button>
           </CardHeader>
           <CardContent>
-            <DocuTables />
+            <RecentTables />
           </CardContent>
         </Card>
       </div>
