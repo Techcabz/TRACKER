@@ -28,8 +28,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Activity, ArrowUpRight, CircleUser, CreditCard, FileCheck, Menu, Package2, Search, FileClock } from 'lucide-vue-next'
+import {
+  Activity,
+  ArrowUpRight,
+  CircleUser,
+  CreditCard,
+  FileCheck,
+  Menu,
+  Package2,
+  Search,
+  FileClock,
+} from "lucide-vue-next";
 import DocuHistory from "@/components/documents/user/tables/DocuHistory.vue";
+import DocuTables from "@/components/documents/user/tables/DocuTables.vue";
 </script>
 
 <template>
@@ -41,7 +52,7 @@ import DocuHistory from "@/components/documents/user/tables/DocuHistory.vue";
             class="flex flex-row items-center justify-between space-y-0 pb-2"
           >
             <CardTitle class="text-sm font-medium"> Total Pending </CardTitle>
-            <FileClock  class="h-4 w-4 text-muted-foreground" />
+            <FileClock class="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div class="text-4xl font-bold">0</div>
@@ -66,15 +77,15 @@ import DocuHistory from "@/components/documents/user/tables/DocuHistory.vue";
               <CardTitle>Document status</CardTitle>
               <CardDescription> Recent uploaded. </CardDescription>
             </div>
-            <Button as-child size="sm" class="ml-auto gap-1 bg-grass11">
-              <a href="#">
+            <Button as-child size="sm" class="ml-auto gap-1 bg-grass11 gap-1 text-white rounded hover:bg-grass11 focus:ring-2 focus:ring-grass11 focus:ring-offset-2 focus:outline-none">
+              <router-link :to="{ name: 'documents' }">
                 View All
                 <ArrowUpRight class="h-4 w-4" />
-              </a>
+              </router-link>
             </Button>
           </CardHeader>
           <CardContent>
-            <DocuHistory />
+            <DocuTables />
           </CardContent>
         </Card>
       </div>

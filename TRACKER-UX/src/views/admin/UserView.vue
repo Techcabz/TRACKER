@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import Button from "@/components/ui/button/Button.vue";
 import Separator from "@/components/ui/separator/Separator.vue";
 import AdminLayouts from "@/layouts/AdminLayouts.vue";
-
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import DocuTables from "@/components/users/admin/UserTables.vue";
 import MiniLink from "@/components/general/breadcrumb/MiniLink.vue";

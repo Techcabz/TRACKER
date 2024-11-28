@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Documents extends Model
 {
+
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'category',
@@ -14,9 +18,7 @@ class Documents extends Model
         'owner_id',
     ];
 
-    protected $table = 'documents';
-
-    public function user()
+    public function users()
     {
         return $this->belongsTo(User::class, 'owner_id', 'id');
     }

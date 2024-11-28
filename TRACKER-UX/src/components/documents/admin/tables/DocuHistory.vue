@@ -46,9 +46,7 @@ export interface Documents {
   category: string;
 }
 
-const data: Documents[] = [
-  
-];
+const data: Documents[] = [];
 
 const columns: ColumnDef<Documents>[] = [
   {
@@ -118,7 +116,7 @@ const columns: ColumnDef<Documents>[] = [
           class: "bg-grass11 text-white",
           onClick: () => console.log("Button clicked for document:", document),
         },
-        "View"
+        () => "View"
       );
     },
   },

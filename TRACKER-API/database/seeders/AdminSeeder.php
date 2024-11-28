@@ -26,9 +26,9 @@ class AdminSeeder extends Seeder
         PersonalDetail::create([
             'users_id' => $user->id,
             'firstname' => 'Admin',
-            'lastname' => 'User',
+            'lastname' => 'ADmin',
             'middlename' => '',
-            'position' => '',
+            'position' => 'Administrator',
         ]);
     }
 }

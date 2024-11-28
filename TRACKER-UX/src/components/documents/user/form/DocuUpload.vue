@@ -2,54 +2,54 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DialogClose } from "radix-vue";
-import { reactive, ref } from "vue";
+import { reactive } from "vue";
 import { useDocuStore } from "@/stores/document";
+import Button from "@/components/ui/button/Button.vue";
 
 const docuStore = useDocuStore();
 
-const formData = ref({
+// cloud config
+const cloudName = 'dqzl4gicv';
+const uploadPreset = 'banner';
+
+const myWidget = cloudinary.createUploadWidget(
+  {
+    cloudName: cloudName,
+    uploadPreset: uploadPreset,
+  },
+  (error: any, result: any) => {
+    if (!error && result && result.event === "success") {
+      console.log(result.info);
+    }
+  }
+);
+
+const openWidget = () => {
+  myWidget.open();
+};
+const formData = reactive({
   name: "",
   category: "",
 });
-
-const formdata = reactive({
-  name: "",
-  category: "",
-});
-
 
 const uploadFile = async () => {
-  // if (!formData.value.file) {
-  //   alert("Please select a file.");
-  //   return;
-  // }
-
-  // console.log(formData.value.file);
-
-  
-  const payload = new FormData();
-  payload.append("name", formData.value.name);
-  payload.append("category", formData.value.category);
-  
-  // Append the file as a File object instead of base64 string
-  //payload.append("file", formData.value.file);
-
   try {
-    // Use the store's uploadDocument method with FormData
-    await docuStore.uploadDocument(payload);
+    const formDataToSend = new FormData();
+
+    formDataToSend.append("name", JSON.stringify(formData.name));
+    formDataToSend.append("category", formData.category);
+
+    await docuStore.uploadDocument(formData);
 
     alert("Document uploaded successfully!");
 
-    // Reset the form data after upload
-    formData.value.name = "";
-    formData.value.category = "";
-    // formData.value.file = null;
+    formData.name = "";
+    formData.category = "";
   } catch (error) {
     console.error("Upload failed:", error);
     alert("Upload failed. Please try again.");
   }
 };
-
 </script>
 
 <template>
@@ -58,7 +58,7 @@ const uploadFile = async () => {
       <!-- Name Input -->
       <div class="grid w-full max-w-sm items-center gap-1.5">
         <Label for="name">Name</Label>
-        <Input id="name" type="text" v-model="formdata.name" required />
+        <Input id="name" type="text" v-model="formData.name" required />
       </div>
 
       <!-- Category Input -->
@@ -67,17 +67,17 @@ const uploadFile = async () => {
         <Input id="category" type="text" v-model="formData.category" required />
       </div>
 
-      <!-- File Input -->
-      <div class="grid w-full max-w-sm items-center gap-1.5">
-        <Label for="file">Picture/PDF</Label>
+      <!-- File Input (Optional) -->
+      <!-- <div class="grid w-full max-w-sm items-center gap-1.5">
+        <Label for="file">Picture/PDF (Optional)</Label>
         <Input
           id="file"
           type="file"
           accept=".png,.jpg,.jpeg,.pdf"
           @change="(e) => (formData.file = e.target.files[0])"
-          required
         />
-      </div>
+      </div> -->
+      <!-- <Button type="button"@click="openWidget">Upload</Button> -->
     </div>
 
     <!-- Buttons -->

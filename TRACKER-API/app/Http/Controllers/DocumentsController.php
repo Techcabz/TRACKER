@@ -2,26 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Log;
 use App\Models\Documents;
 use Illuminate\Http\Request;
-use App\Http\Requests\StoreDocumentsRequest;
-use App\Http\Requests\UpdateDocumentsRequest;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 
+
 class DocumentsController extends Controller implements HasMiddleware
 {
-
     public static function middleware()
     {
         return [
             new Middleware('auth:sanctum', except: ['index', 'show'])
         ];
     }
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         return Documents::all();
@@ -32,27 +27,27 @@ class DocumentsController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
-        \Log::info($request->all()); // Log all incoming data
-        \Log::info($request->file('file')); // Log the file details
 
+        // return response()->json([
+        //     'request_data' => $request->all(),
+        // ], 200);
         $fields = $request->validate([
             'name' => 'required|max:255',
             'category' => 'required|max:255',
-
         ]);
-
-        $filePath = $request->file('file')->store('documents', 'public');
-
         $document = new Documents();
         $document->name = $fields['name'];
-        $document->status = 1;
         $document->category = $fields['category'];
-        $document->file_path = "xxxx";
+        $document->status = 1;
+        $document->file_path = "path";
         $document->owner_id = auth()->id();
         $document->save();
 
-
-        return response()->json(['message' => 'Request logged.'], 200);
+        // Return a response
+        return response()->json([
+            'message' => 'Document saved temporarily.',
+            'document_id' => $document->id,
+        ], 200);
     }
 
     /**
@@ -60,15 +55,15 @@ class DocumentsController extends Controller implements HasMiddleware
      */
     public function show(Documents $documents)
     {
-        return "DOCX SHOW";
+        return ['documents' => $documents];
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateDocumentsRequest $request, Documents $documents)
+    public function update(Request $request, Documents $documents)
     {
-        return "DOCX UPDATE";
+        return "HI";
     }
 
     /**
@@ -76,6 +71,6 @@ class DocumentsController extends Controller implements HasMiddleware
      */
     public function destroy(Documents $documents)
     {
-        return "DOCX DESTROY";
+        return "HI";
     }
 }

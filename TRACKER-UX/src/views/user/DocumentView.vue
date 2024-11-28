@@ -6,11 +6,20 @@ import DocuUpload from "@/components/documents/user/form/DocuUpload.vue";
 import Button from "@/components/ui/button/Button.vue";
 import Separator from "@/components/ui/separator/Separator.vue";
 import AdminLayouts from "@/layouts/AdminLayouts.vue";
-
+import { useDocuStore } from "@/stores/document";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import DocuTables from "@/components/documents/tables/DocuTables.vue";
+const docuStore = useDocuStore();
 import DocuHistory from "@/components/documents/user/tables/DocuHistory.vue";
 import MiniLink from "@/components/general/breadcrumb/MiniLink.vue";
+
+import { onMounted, ref } from "vue";
+import DocuTables from "@/components/documents/user/tables/DocuTables.vue";
+const documents = ref(docuStore.documents); // Local reactive state to store documents
+
+onMounted(async () => {
+  await docuStore.fetchDocuments();
+  documents.value = docuStore.documents;
+});
 </script>
 
 <template>
@@ -41,6 +50,7 @@ import MiniLink from "@/components/general/breadcrumb/MiniLink.vue";
               <h1 class="text-lg font-semibold md:text-2xl">Documents</h1>
             </div>
             <div
+              v-if="docuStore.documents.length === 0"
               class="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm py-5"
             >
               <div class="flex flex-col items-center gap-3 text-center">
@@ -70,6 +80,12 @@ import MiniLink from "@/components/general/breadcrumb/MiniLink.vue";
                   </template>
                 </DocuDialog>
               </div>
+            </div>
+
+            <!-- Show Documents if available -->
+            <div v-else>
+              <!-- Render your documents table or content here -->
+              <DocuTables />
             </div>
           </div>
         </TabsContent>

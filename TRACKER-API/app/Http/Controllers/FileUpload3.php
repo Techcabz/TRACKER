@@ -11,7 +11,7 @@ class FileUpload3 extends Controller
     {
 
         if ($request->hasFile('file')) {
-            
+
             $request->file('file')->store('documents', 'public');
             return response()->json("Uploaded successfully.");
         }

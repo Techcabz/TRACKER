@@ -118,7 +118,7 @@ const columns: ColumnDef<Documents>[] = [
           class: "bg-grass11 text-white",
           onClick: () => console.log("Button clicked for document:", document),
         },
-        "View"
+       () => "View"
       );
     },
   },

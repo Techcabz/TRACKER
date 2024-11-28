@@ -1,16 +1,11 @@
-import { defineStore } from "pinia";
 import axios from "axios";
+import { defineStore } from "pinia";
 
 export const useDocuStore = defineStore("docuStore", {
   state: () => ({
-    documents: [] as Array<{
-      id: number;
-      name: string;
-      category: string;
-      file: null;
-    }>,
     isLoading: false,
     errors: null as string | null,
+    documents: [] as any[], // Add a documents array to hold the fetched documents
   }),
 
   actions: {
@@ -32,7 +27,8 @@ export const useDocuStore = defineStore("docuStore", {
         }
 
         const data = await response.json();
-        this.documents = data;
+    
+        this.documents = data; // Store the fetched documents in the state
       } catch (error: any) {
         this.errors = error.message || "Failed to fetch documents.";
       } finally {
@@ -41,60 +37,40 @@ export const useDocuStore = defineStore("docuStore", {
     },
 
     // Upload a document to the server
-    async uploadDocument(payload: FormData) {
+    async uploadDocument(formData) {
       const token = localStorage.getItem("token");
       this.isLoading = true;
       this.errors = null;
 
-      axios.post("/api/upload", payload).then((res) => {
-        console.log("uploaded: ", res.data);
-      });
+      try {
+        const response = await fetch("/api/documents", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        });
 
-      // const formDataToObject = (formData: FormData) => {
-      //   const obj: Record<string, any> = {};
-      //   formData.forEach((value, key) => {
-      //     obj[key] = value;
-      //   });
-      //   return obj;
-      // };
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to upload document.");
+        }
 
-      // // Inside your `uploadDocument` function
-      // const formDataObject = formDataToObject(payload);
-      // console.log(formDataObject);
-
-      // try {
-      //   const response = await fetch("/api/upload", {
-      //     method: "POST",
-      //     headers: {
-      //       Authorization: `Bearer ${token}`,
-      //       // No need to set 'Content-Type' header, because FormData will handle it
-      //     },
-      //     body: payload, // Send the FormData directly
-      //   });
-
-      //   if (!response.ok) {
-      //     const errorData = await response.json();
-      //     throw new Error(errorData.message || "Failed to upload document.");
-      //   }
-
-      //   const data = await response.json();
-      //   // Add the uploaded document to the local store
-      //   this.documents.push(data);
-      //   return data;
-      // } catch (error: any) {
-      //   this.errors = error.message || "Failed to upload document.";
-      //   throw error;
-      // } finally {
-      //   this.isLoading = false;
-      // }
+        const data = await response.json();
+        this.documents.push(data); // Add the uploaded document to the state
+        return data;
+      } catch (error: any) {
+        this.errors = error.message || "Failed to upload document.";
+        throw error;
+      } finally {
+        this.isLoading = false;
+      }
     },
 
-    // Example: Remove a document from the local state (useful for delete actions)
     removeDocument(documentId: number) {
       this.documents = this.documents.filter((doc) => doc.id !== documentId);
     },
 
-    // Example: Update a document's details in local state (useful for editing)
     updateDocument(updatedDoc: { id: number; name: string; category: string }) {
       const index = this.documents.findIndex((doc) => doc.id === updatedDoc.id);
       if (index !== -1) {
