@@ -48,7 +48,6 @@ export const useUserStore = defineStore("userStore", {
       }
     },
 
-
     async getLoggedInUser() {
       const token = localStorage.getItem("token");
       try {
@@ -68,7 +67,6 @@ export const useUserStore = defineStore("userStore", {
         console.error("Error fetching logged-in user data", error);
       }
     },
-
 
     // Store a new user
     async storeUser(userData: User): Promise<boolean> {
@@ -137,6 +135,39 @@ export const useUserStore = defineStore("userStore", {
         return false;
       }
     },
+    async changeStatus(
+      userId: number,
+      status: number
+    ): Promise<{ success: boolean; data?: any; errors?: any }> {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.error("No token found");
+        return { success: false, errors: "No token found" }; // Returning error object instead of just false
+      }
+
+      try {
+        const res = await fetch(`/api/users/${userId}/approve`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          return { success: true, data };
+        } else {
+          const data = await res.json();
+          return { success: false, errors: data.errors };
+        }
+      } catch (error) {
+        console.error("Error while updating user status", error);
+        return { success: false, errors: error.message };
+      }
+    },
 
     // Delete a user
     async deleteUser(userId: number): Promise<boolean> {
@@ -152,12 +183,12 @@ export const useUserStore = defineStore("userStore", {
 
           if (res.ok) {
             console.log(`User with id ${userId} deleted`);
-            return true; // Successfully deleted
+            return true;
           } else {
             const data = await res.json();
             this.errors = data.errors || {};
             console.error("Failed to delete user:", data.errors);
-            return false; // Failed to delete
+            return false;
           }
         } else {
           console.error("No token found");

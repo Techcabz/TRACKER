@@ -22,7 +22,8 @@ Route::post('/upload', [FileUpload3::class, 'upload']);
 
 Route::get('/users', [UserController::class, 'GetUser']);
 Route::get('/users_auth', [UserController::class, 'GetLogginUser']);
-Route::post('/users_status', [UserController::class, 'UpdateStatusUser']);
+Route::put('/users/{userId}/approve', [UserController::class, 'changeUserStatus']);
+Route::delete('/users_delete', [UserController::class, 'deleteUser']);
 
 
 Route::post('/register', [AuthController::class, 'register']);

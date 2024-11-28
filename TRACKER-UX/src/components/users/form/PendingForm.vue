@@ -9,20 +9,56 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useUserStore } from "@/stores/user";
+import { useToast } from "@/components/ui/toast/use-toast";
 
 import { defineProps } from "vue";
+const userStore = useUserStore();
+const { toast } = useToast();
 
-defineProps({
+const props = defineProps<{
   selectedUser: {
-    type: Object,
-    required: true,
-  },
-});
+    id: string;
+    username: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+    position: string;
+  };
+}>();
 
-const cancelForm = () => {};
+const cancelForm = () => {
+  alert("cancel");
+};
 
-// Approve action: change the status of the user to "approved" (1)
-const approveUser = () => {};
+const approveUser = async () => {
+  if (props.selectedUser && props.selectedUser.id) {
+    try {
+      const res = await userStore.changeStatus(
+        Number(props.selectedUser.id),
+        1
+      );
+
+      if (res.success) {
+        toast({
+          description: "User approved successfully.",
+          class: "bg-green-500 text-white",
+        });
+      } else {
+        toast({
+          description: "User approval failed. Please check the errors.",
+          class: "bg-red-500 text-white",
+        });
+      }
+    } catch (error) {
+      console.error("Error during approval:", error);
+      toast({
+        description: "Something went wrong while approving the user.",
+        class: "bg-red-500 text-white",
+      });
+    }
+  }
+};
 </script>
 
 <template>
@@ -94,7 +130,7 @@ const approveUser = () => {};
           class="bg-red4 text-red11 hover:bg-red5 focus:shadow-red4 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none focus:shadow-[0_0_0_2px] focus:outline-none"
           @click="cancelForm"
         >
-          Cancel
+          Disapproved
         </Button>
 
         <Button

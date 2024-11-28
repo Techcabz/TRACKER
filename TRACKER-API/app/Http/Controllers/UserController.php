@@ -58,7 +58,22 @@ class UserController extends Controller
         return response()->json(['message' => 'User not authenticated'], 401);
     }
 
-    public function UpdateStatusUser(){
+    public function changeUserStatus($userId)
+    {
+        $user = User::find($userId);
 
+        if ($user) {
+            $user->status = 1;
+            $user->save();
+
+            return response()->json([
+                'message' => 'User approved successfully.',
+                'user' => $user,
+            ], 200);
+        }
+
+        return response()->json(['message' => 'User not found.'], 404);
     }
+
+    public function deleteUser() {}
 }
