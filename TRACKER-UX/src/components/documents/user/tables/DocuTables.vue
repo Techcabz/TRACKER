@@ -127,7 +127,7 @@ const columns: ColumnDef<Documents>[] = [
         {
           variant: badgeVariant,
         },
-        statusString
+        () => statusString 
       );
     },
   },

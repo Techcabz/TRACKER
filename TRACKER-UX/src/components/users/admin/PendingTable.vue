@@ -8,7 +8,6 @@ import type {
 } from "@tanstack/vue-table";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -37,48 +36,56 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import { h, ref } from "vue";
+import { h, ref, onMounted, computed } from "vue";
+import { useUserStore } from "@/stores/user";
+import { Badge } from "@/components/ui/badge";
 
-export interface Documents {
+const userStore = useUserStore();
+const users = ref(userStore.users);
+
+// Define the Users interface
+export interface Users {
   id: string;
-  name: string;
-  status: "pending" | "processing" | "success" | "failed";
-  category: string;
+  username: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  position: string;
+  status: number;
 }
 
-const data: Documents[] = [
-  
-  
-];
+const statusMap = {
+  0: "Pending",
+  1: "Approved",
+};
 
-const columns: ColumnDef<Documents>[] = [
-  {
-    id: "select",
-    header: ({ table }) =>
-      h(Checkbox, {
-        checked:
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate"),
-        "onUpdate:checked": (value) => table.toggleAllPageRowsSelected(!!value),
-        ariaLabel: "Select all",
-      }),
-    cell: ({ row }) =>
-      h(Checkbox, {
-        checked: row.getIsSelected(),
-        "onUpdate:checked": (value) => row.toggleSelected(!!value),
-        ariaLabel: "Select row",
-      }),
-    enableSorting: false,
-    enableHiding: false,
-  },
+const statusBadgeMap = {
+  Pending: "default",
+  Approved: "secondary",
+};
+
+onMounted(async () => {
+  try {
+    await userStore.getUserList();
+    users.value = userStore.users;
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+  }
+});
+
+const filteredUsers = computed(() => {
+  return users.value.filter(
+    (users) => users.role_as === 0 && users.status === 0
+  );
+});
+
+console.log(...users.value);
+const data: Users[] = [...filteredUsers.value];
+
+// Define the columns for the table
+const columns: ColumnDef<Users>[] = [
   {
     accessorKey: "username",
-    header: "Username",
-    cell: ({ row }) =>
-      h("div", { class: "capitalize" }, row.getValue("username")),
-  },
-  {
-    accessorKey: "name",
     header: ({ column }) => {
       return h(
         Button,
@@ -86,10 +93,11 @@ const columns: ColumnDef<Documents>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Name", h(CaretSortIcon, { class: "ml-2 h-4 w-4" })]
+        () => ["Username", h(CaretSortIcon, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) => h("div", { class: "lowercase" }, row.getValue("name")),
+    cell: ({ row }) =>
+      h("div", { class: "lowercase" }, row.getValue("username")),
   },
   {
     accessorKey: "email",
@@ -103,8 +111,7 @@ const columns: ColumnDef<Documents>[] = [
         () => ["Email", h(CaretSortIcon, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) =>
-      h("div", { class: "lowercase" }, row.getValue("email")),
+    cell: ({ row }) => h("div", { class: "lowercase" }, row.getValue("email")),
   },
   {
     accessorKey: "position",
@@ -122,6 +129,31 @@ const columns: ColumnDef<Documents>[] = [
       h("div", { class: "lowercase" }, row.getValue("position")),
   },
   {
+    accessorKey: "status",
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Status", h(CaretSortIcon, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) => {
+      const status = row.getValue("status");
+      const statusString = statusMap[status] || "Unknown";
+      const badgeVariant = statusBadgeMap[statusString] || "gray";
+      return h(
+        Badge,
+        {
+          variant: badgeVariant,
+        },
+        () => statusString
+      );
+    },
+  },
+  {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
@@ -134,18 +166,19 @@ const columns: ColumnDef<Documents>[] = [
           class: "bg-grass11 text-white",
           onClick: () => console.log("Button clicked for document:", document),
         },
-        "View"
+        () => "View"
       );
     },
   },
 ];
 
+// State for the table
 const sorting = ref<SortingState>([]);
 const columnFilters = ref<ColumnFiltersState>([]);
 const columnVisibility = ref<VisibilityState>({});
-const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
 
+// Setup table
 const table = useVueTable({
   data,
   columns,
@@ -159,8 +192,6 @@ const table = useVueTable({
     valueUpdater(updaterOrValue, columnFilters),
   onColumnVisibilityChange: (updaterOrValue) =>
     valueUpdater(updaterOrValue, columnVisibility),
-  onRowSelectionChange: (updaterOrValue) =>
-    valueUpdater(updaterOrValue, rowSelection),
   onExpandedChange: (updaterOrValue) => valueUpdater(updaterOrValue, expanded),
   state: {
     get sorting() {
@@ -171,9 +202,6 @@ const table = useVueTable({
     },
     get columnVisibility() {
       return columnVisibility.value;
-    },
-    get rowSelection() {
-      return rowSelection.value;
     },
     get expanded() {
       return expanded.value;
@@ -189,7 +217,9 @@ const table = useVueTable({
         class="max-w-sm"
         placeholder="Filter users..."
         :model-value="table.getColumn('username')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('username')?.setFilterValue($event)"
+        @update:model-value="
+          table.getColumn('username')?.setFilterValue($event)
+        "
       />
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
@@ -235,7 +265,7 @@ const table = useVueTable({
         <TableBody>
           <template v-if="table.getRowModel().rows?.length">
             <template v-for="row in table.getRowModel().rows" :key="row.id">
-              <TableRow :data-state="row.getIsSelected() && 'selected'">
+              <TableRow>
                 <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
                   <FlexRender
                     :render="cell.column.columnDef.cell"
@@ -250,7 +280,6 @@ const table = useVueTable({
               </TableRow>
             </template>
           </template>
-
           <TableRow v-else>
             <TableCell :colspan="columns.length" class="h-24 text-center">
               No results.

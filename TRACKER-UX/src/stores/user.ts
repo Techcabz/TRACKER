@@ -16,39 +16,35 @@ interface User {
 
 export const useUserStore = defineStore("userStore", {
   state: () => ({
-    errors: {} as Record<string, string[]>, // Track errors
+    errors: {} as Record<string, string[]>,
+    users: [] as any[],
   }),
 
   actions: {
     // Fetch user list
-    async getUserList(): Promise<User[] | null> {
+    async getUserList() {
       const token = localStorage.getItem("token");
-      this.loading = true;
+      this.isLoading = true;
+      this.errors = null;
+
       try {
-        if (token) {
-          const res = await fetch("/api/users", {
-            headers: {
-              authorization: `Bearer ${token}`,
-            },
-          });
+        const response = await fetch("/api/users", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-          if (res.ok) {
-            const data = await res.json();
-
-            return data; // Return the list of users
-          } else {
-            console.error("Failed to fetch user data");
-            return null;
-          }
-        } else {
-          console.error("No token found");
-          return null;
+        if (!response.ok) {
+          throw new Error("Failed to fetch users.");
         }
-      } catch (error) {
-        console.error("Error while fetching users", error);
-        return null;
+
+        const data = await response.json();
+
+        this.users = data;
+      } catch (error: any) {
+        this.errors = error.message || "Failed to fetch users.";
       } finally {
-        this.loading = false;
+        this.isLoading = false;
       }
     },
 

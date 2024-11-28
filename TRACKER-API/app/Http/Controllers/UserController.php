@@ -12,6 +12,8 @@ class UserController extends Controller
         $users = User::with('personalDetails')->get();
 
         return $users->map(function ($user) {
+            $personalDetails = $user->personalDetails->first(); 
+
             return [
                 'id' => $user->id,
                 'username' => $user->username,
@@ -21,13 +23,9 @@ class UserController extends Controller
                 'role_as' => $user->role_as,
                 'created_at' => $user->created_at,
                 'updated_at' => $user->updated_at,
-                'personal_details' => $user->personalDetails->map(function ($detail) {
-                    return [
-                        'firstname' => $detail->firstname,
-                        'lastname' => $detail->lastname,
-                        'position' => $detail->position,
-                    ];
-                }),
+                'firstname' => $personalDetails?->firstname,
+                'lastname' => $personalDetails?->lastname,
+                'position' => $personalDetails?->position,
             ];
         });
     }

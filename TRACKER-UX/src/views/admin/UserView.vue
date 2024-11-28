@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import Separator from "@/components/ui/separator/Separator.vue";
 import AdminLayouts from "@/layouts/AdminLayouts.vue";
-
-import DocuTables from "@/components/users/admin/UserTables.vue";
 import MiniLink from "@/components/general/breadcrumb/MiniLink.vue";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PendingTable from "@/components/users/admin/PendingTable.vue";
+import UserTables from "@/components/users/admin/UserTables.vue";
 </script>
 
 <template>
@@ -15,7 +17,25 @@ import MiniLink from "@/components/general/breadcrumb/MiniLink.vue";
         <!-- SearchBar -->
       </div>
       <Separator orientation="horizontal" />
-      <DocuTables />
+
+      <Tabs default-value="upload">
+        <!-- Filters and Navigation -->
+        <div class="flex">
+          <div class="md:flex items-center">
+            <TabsList>
+              <TabsTrigger value="upload">All User</TabsTrigger>
+              <TabsTrigger value="history"> Pending User </TabsTrigger>
+            </TabsList>
+          </div>
+        </div>
+        <!-- Content -->
+        <TabsContent value="upload">
+          <UserTables />
+        </TabsContent>
+        <TabsContent value="history">
+          <PendingTable />
+        </TabsContent>
+      </Tabs>
     </div>
   </AdminLayouts>
 </template>

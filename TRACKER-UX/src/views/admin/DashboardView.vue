@@ -41,6 +41,21 @@ import {
 } from "lucide-vue-next";
 import DocuHistory from "@/components/documents/user/tables/DocuHistory.vue";
 import DocuTables from "@/components/documents/user/tables/DocuTables.vue";
+import { onMounted, computed } from "vue";
+import { useAuthStore } from "@/stores/auth";
+
+const authStore = useAuthStore();
+
+onMounted(() => {
+  authStore.getUser();
+});
+
+const isAdmin = computed(() => {
+  if (authStore.user) {
+    return authStore.user?.role == "1";
+  }
+});
+
 </script>
 
 <template>
@@ -77,8 +92,16 @@ import DocuTables from "@/components/documents/user/tables/DocuTables.vue";
               <CardTitle>Document status</CardTitle>
               <CardDescription> Recent uploaded. </CardDescription>
             </div>
-            <Button as-child size="sm" class="ml-auto gap-1 bg-grass11 gap-1 text-white rounded hover:bg-grass11 focus:ring-2 focus:ring-grass11 focus:ring-offset-2 focus:outline-none">
-              <router-link :to="{ name: 'documents' }">
+            <Button
+              as-child
+              size="sm"
+              class="ml-auto gap-1 bg-grass11 gap-1 text-white rounded hover:bg-grass11 focus:ring-2 focus:ring-grass11 focus:ring-offset-2 focus:outline-none"
+            >
+              <router-link v-if="isAdmin" :to="{ name: 'document' }">
+                View All
+                <ArrowUpRight class="h-4 w-4" />
+              </router-link>
+              <router-link v-else :to="{ name: 'documents' }">
                 View All
                 <ArrowUpRight class="h-4 w-4" />
               </router-link>

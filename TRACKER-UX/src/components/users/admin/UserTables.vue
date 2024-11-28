@@ -36,53 +36,56 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import { h, ref, onMounted } from "vue";
+import { h, ref, onMounted, computed } from "vue";
 import { useUserStore } from "@/stores/user";
+import { Badge } from "@/components/ui/badge";
 
 const userStore = useUserStore();
-
-// Define the data as a reactive reference
-const data = ref<Users[]>([]);
-
-onMounted(async () => {
-  try {
-    const users = await userStore.getUserList(); // Ensure this returns the expected data
-    if (users && Array.isArray(users)) {
-      // Clear existing data
-      data.value.length = 0;
-
-      // Populate the data array
-      users.forEach((user: any) => {
-        data.value.push({
-          id: user.id,
-          name: `xxxxxxxx`, // Replace with actual logic for user name if necessary
-          email: user.email,
-          position: user.personalDetails?.position || "Not Available", // Default value if no position
-          status: user.status || "pending", // Default status if not available
-        });
-      });
-    }
-  } catch (error) {
-    console.error("Failed to fetch users:", error);
-  }
-  
-  // Log after data has been populated to verify
-  console.log(data.value);
-});
+const users = ref(userStore.users);
 
 // Define the Users interface
 export interface Users {
   id: string;
-  name: string;
+  username: string;
+  firstname: string;
+  lastname: string;
   email: string;
   position: string;
-  status: "pending" | "processing" | "success" | "failed";
+  status: number;
 }
+
+const statusMap = {
+  0: "Pending",
+  1: "Approved",
+};
+
+const statusBadgeMap = {
+  Pending: "default",
+  Approved: "secondary",
+};
+
+onMounted(async () => {
+  try {
+    await userStore.getUserList();
+    users.value = userStore.users;
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+  }
+});
+
+const filteredUsers = computed(() => {
+  return users.value.filter(
+    (users) => users.role_as === 0 && users.status === 1
+  );
+});
+
+console.log(...users.value);
+const data: Users[] = [...filteredUsers.value];
 
 // Define the columns for the table
 const columns: ColumnDef<Users>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "username",
     header: ({ column }) => {
       return h(
         Button,
@@ -90,10 +93,11 @@ const columns: ColumnDef<Users>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Name", h(CaretSortIcon, { class: "ml-2 h-4 w-4" })]
+        () => ["Username", h(CaretSortIcon, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) => h("div", { class: "lowercase" }, row.getValue("name")),
+    cell: ({ row }) =>
+      h("div", { class: "lowercase" }, row.getValue("username")),
   },
   {
     accessorKey: "email",
@@ -136,7 +140,18 @@ const columns: ColumnDef<Users>[] = [
         () => ["Status", h(CaretSortIcon, { class: "ml-2 h-4 w-4" })]
       );
     },
-    cell: ({ row }) => h("div", { class: "lowercase" }, row.getValue("status")),
+    cell: ({ row }) => {
+      const status = row.getValue("status");
+      const statusString = statusMap[status] || "Unknown";
+      const badgeVariant = statusBadgeMap[statusString] || "gray";
+      return h(
+        Badge,
+        {
+          variant: badgeVariant,
+        },
+        () => statusString
+      );
+    },
   },
   {
     id: "actions",
@@ -148,9 +163,10 @@ const columns: ColumnDef<Users>[] = [
         {
           variant: "outline",
           size: "sm",
+          class: "bg-grass11 text-white",
           onClick: () => console.log("Button clicked for document:", document),
         },
-        "View"
+        () => "View"
       );
     },
   },
@@ -160,12 +176,11 @@ const columns: ColumnDef<Users>[] = [
 const sorting = ref<SortingState>([]);
 const columnFilters = ref<ColumnFiltersState>([]);
 const columnVisibility = ref<VisibilityState>({});
-const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
 
 // Setup table
 const table = useVueTable({
-  data: data.value, // Ensure you use `data.value`
+  data,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -201,8 +216,10 @@ const table = useVueTable({
       <Input
         class="max-w-sm"
         placeholder="Filter users..."
-        :model-value="table.getColumn('name')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('name')?.setFilterValue($event)"
+        :model-value="table.getColumn('username')?.getFilterValue() as string"
+        @update:model-value="
+          table.getColumn('username')?.setFilterValue($event)
+        "
       />
       <DropdownMenu>
         <DropdownMenuTrigger as-child>

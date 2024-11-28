@@ -8,7 +8,7 @@ import type {
 } from "@tanstack/vue-table";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,7 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
+import { useDocuStore } from "@/stores/document";
 import { valueUpdater } from "@/utils";
 import { CaretSortIcon, ChevronDownIcon } from "@radix-icons/vue";
 import {
@@ -37,43 +37,47 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import { h, ref } from "vue";
+import { h, ref, onMounted, computed } from "vue";
+
+const docuStore = useDocuStore();
+const documents = ref(docuStore.documents);
+
+onMounted(async () => {
+  await docuStore.fetchDocuments();
+  documents.value = docuStore.documents;
+});
 
 export interface Documents {
   id: string;
   name: string;
-  status: "pending" | "processing" | "success" | "failed";
+  status: number;
   category: string;
 }
 
-const data: Documents[] = [];
+const statusMap = {
+  1: "Pending",
+  0: "Success",
+  2: "Processing",
+  3: "Failed",
+};
+
+const statusBadgeMap = {
+  Pending: "default",
+  Success: "secondary",
+  Processing: "outline",
+  Failed: "destructive",
+};
+
+console.log(documents.value)
+const filteredDocuments = computed(() => {
+  return documents.value.filter(
+    (document) => document.status === 0 || document.status === 3
+  );
+});
+
+const data: Documents[] = [...filteredDocuments.value];
 
 const columns: ColumnDef<Documents>[] = [
-  {
-    id: "select",
-    header: ({ table }) =>
-      h(Checkbox, {
-        checked:
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate"),
-        "onUpdate:checked": (value) => table.toggleAllPageRowsSelected(!!value),
-        ariaLabel: "Select all",
-      }),
-    cell: ({ row }) =>
-      h(Checkbox, {
-        checked: row.getIsSelected(),
-        "onUpdate:checked": (value) => row.toggleSelected(!!value),
-        ariaLabel: "Select row",
-      }),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) =>
-      h("div", { class: "capitalize" }, row.getValue("status")),
-  },
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -102,6 +106,31 @@ const columns: ColumnDef<Documents>[] = [
     },
     cell: ({ row }) =>
       h("div", { class: "lowercase" }, row.getValue("category")),
+  },
+  {
+    accessorKey: "status",
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Status", h(CaretSortIcon, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) => {
+      const status = row.getValue("status");
+      const statusString = statusMap[status] || "Unknown";
+      const badgeVariant = statusBadgeMap[statusString] || "gray";
+      return h(
+        Badge,
+        {
+          variant: badgeVariant,
+        },
+        () => statusString 
+      );
+    },
   },
   {
     id: "actions",
@@ -170,8 +199,8 @@ const table = useVueTable({
       <Input
         class="max-w-sm"
         placeholder="Filter documents..."
-        :model-value="table.getColumn('email')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('email')?.setFilterValue($event)"
+        :model-value="table.getColumn('name')?.getFilterValue() as string"
+        @update:model-value="table.getColumn('name')?.setFilterValue($event)"
       />
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
@@ -268,3 +297,9 @@ const table = useVueTable({
     </div>
   </div>
 </template>
+
+<style lang="css" scoped>
+.lowercase {
+  margin-left: 15px !important;
+}
+</style>
