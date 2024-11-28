@@ -39,6 +39,8 @@ import {
 import { h, ref, onMounted, computed } from "vue";
 import { useUserStore } from "@/stores/user";
 import { Badge } from "@/components/ui/badge";
+import CustomDialog from "@/components/general/dialog/CustomDialog.vue";
+import { User } from "lucide-vue-next";
 
 const userStore = useUserStore();
 const users = ref(userStore.users);
@@ -81,6 +83,13 @@ const filteredUsers = computed(() => {
 
 console.log(...users.value);
 const data: Users[] = [...filteredUsers.value];
+
+const getDocumentById = (id: string) => {
+  return users.value.find((user) => user.id === id); // Assuming `users` is your list of documents
+};
+
+const isDialogOpen = ref(false);
+const selectedUserId = ref(User);
 
 // Define the columns for the table
 const columns: ColumnDef<Users>[] = [
@@ -157,14 +166,17 @@ const columns: ColumnDef<Users>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const document = row.original;
+      const userID = row.original.id;
       return h(
         Button,
         {
           variant: "outline",
           size: "sm",
           class: "bg-grass11 text-white",
-          onClick: () => console.log("Button clicked for document:", document),
+          onClick: () => {
+          // Set the selected document ID
+            isDialogOpen.value = true; // Open the dialog
+          },
         },
         () => "View"
       );
@@ -211,6 +223,39 @@ const table = useVueTable({
 </script>
 
 <template>
+  <CustomDialog
+    v-model:open="isDialogOpen"
+    title="Upload Documents"
+    description="Please upload your document files below."
+    closeText="Cancel"
+    saveText="Upload"
+  >
+    <template #default>
+      <div v-if="selectedDocumentId">
+        <!-- Find the selected document by id -->
+        <p>
+          <strong>Username:</strong>
+          {{ getDocumentById(selectedDocumentId)?.username }}
+        </p>
+        <p>
+          <strong>Email:</strong>
+          {{ getDocumentById(selectedDocumentId)?.email }}
+        </p>
+        <p>
+          <strong>Position:</strong>
+          {{ getDocumentById(selectedDocumentId)?.position }}
+        </p>
+        <p>
+          <strong>Status:</strong>
+          {{ statusMap[getDocumentById(selectedDocumentId)?.status || 0] }}
+        </p>
+      </div>
+      <div v-else>
+        <p>No document selected.</p>
+      </div>
+    </template>
+  </CustomDialog>
+
   <div class="w-full">
     <div class="flex items-center py-4">
       <Input

@@ -53,11 +53,16 @@ class DocumentsController extends Controller implements HasMiddleware
     /**
      * Display the specified resource.
      */
-    public function show(Documents $documents)
+    public function show($id)
     {
-        return ['documents' => $documents];
-    }
+        $document = Documents::where('owner_id', $id)->first();
 
+        if (!$document) {
+            return response()->json(['error' => 'Document not found'], 404);
+        }
+
+        return response()->json([$document]);
+    }
     /**
      * Update the specified resource in storage.
      */

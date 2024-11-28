@@ -21,6 +21,8 @@ Route::apiResource('personal', PersonalDetailController::class)->middleware('aut
 Route::post('/upload', [FileUpload3::class, 'upload']);
 
 Route::get('/users', [UserController::class, 'GetUser']);
+Route::get('/users_auth', [UserController::class, 'GetLogginUser']);
+
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

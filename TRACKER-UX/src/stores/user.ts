@@ -48,6 +48,28 @@ export const useUserStore = defineStore("userStore", {
       }
     },
 
+
+    async getLoggedInUser() {
+      const token = localStorage.getItem("token");
+      try {
+        const response = await fetch("/api/users_auth", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch logged-in user.");
+        }
+
+        const data = await response.json();
+        this.loggedInUser = data; // Store logged-in user data
+      } catch (error: any) {
+        console.error("Error fetching logged-in user data", error);
+      }
+    },
+
+
     // Store a new user
     async storeUser(userData: User): Promise<boolean> {
       const token = localStorage.getItem("token");

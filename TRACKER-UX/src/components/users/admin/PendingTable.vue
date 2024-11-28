@@ -39,7 +39,7 @@ import {
 import { h, ref, onMounted, computed } from "vue";
 import { useUserStore } from "@/stores/user";
 import { Badge } from "@/components/ui/badge";
-
+import CustomDialog from "@/components/general/dialog/CustomDialog.vue";
 const userStore = useUserStore();
 const users = ref(userStore.users);
 
@@ -79,9 +79,9 @@ const filteredUsers = computed(() => {
   );
 });
 
-console.log(...users.value);
 const data: Users[] = [...filteredUsers.value];
 
+const isDialogOpen = ref(false);
 // Define the columns for the table
 const columns: ColumnDef<Users>[] = [
   {
@@ -164,7 +164,10 @@ const columns: ColumnDef<Users>[] = [
           variant: "outline",
           size: "sm",
           class: "bg-grass11 text-white",
-          onClick: () => console.log("Button clicked for document:", document),
+          onClick: () => {
+            // Set the selected document ID
+            isDialogOpen.value = true; // Open the dialog
+          },
         },
         () => "View"
       );
@@ -208,9 +211,22 @@ const table = useVueTable({
     },
   },
 });
+
 </script>
 
 <template>
+  <CustomDialog
+    v-model:open="isDialogOpen"
+    title="Upload Documents"
+    description=""
+    closeText="Cancel"
+    saveText="Upload"
+  >
+    <template #default>
+       
+    </template>
+  </CustomDialog>
+
   <div class="w-full">
     <div class="flex items-center py-4">
       <Input

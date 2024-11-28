@@ -144,7 +144,12 @@ const totalRejected = computed(() => {
               size="sm"
               class="ml-auto gap-1 bg-grass11 text-white rounded hover:bg-grass11 focus:ring-2 focus:ring-grass11 focus:ring-offset-2 focus:outline-none"
             >
-              <router-link :to="{ name: 'document' }">
+              <router-link v-if="isAdmin" :to="{ name: 'document' }">
+                View All
+                <ArrowUpRight class="h-4 w-4" />
+              </router-link>
+
+               <router-link v-else :to="{ name: 'documents' }">
                 View All
                 <ArrowUpRight class="h-4 w-4" />
               </router-link>

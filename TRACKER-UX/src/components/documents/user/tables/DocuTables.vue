@@ -40,11 +40,11 @@ import {
 import { h, ref, onMounted, computed } from "vue";
 
 const docuStore = useDocuStore();
-const documents = ref(docuStore.documents);
+const document = ref(docuStore.document);
 
 onMounted(async () => {
-  await docuStore.fetchDocuments();
-  documents.value = docuStore.documents;
+  await docuStore.getDocuments();
+  document.value = docuStore.document;
 });
 
 export interface Documents {
@@ -69,7 +69,7 @@ const statusBadgeMap = {
 };
 
 const filteredDocuments = computed(() => {
-  return documents.value.filter(
+  return document.value.filter(
     (document) => document.status === 1 || document.status === 2
   );
 });
@@ -127,7 +127,7 @@ const columns: ColumnDef<Documents>[] = [
         {
           variant: badgeVariant,
         },
-        () => statusString 
+        () => statusString
       );
     },
   },

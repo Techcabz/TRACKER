@@ -57,7 +57,10 @@ export const useAuthStore = defineStore("authStore", {
             this.user = {
               ...data,
               role: data.role_as,
-              personalDetails: data.personal_details.length > 0 ? data.personal_details[0] : null, 
+              personalDetails:
+                data.personal_details.length > 0
+                  ? data.personal_details[0]
+                  : null,
             };
 
             this.userRole = data.role_as === 1 ? "admin" : "user";
@@ -101,7 +104,8 @@ export const useAuthStore = defineStore("authStore", {
         this.user = {
           ...data.user,
           role: data.role_as,
-          personalDetails: data.personal_details.length > 0 ? data.personal_details[0] : null, 
+          personalDetails:
+            data.personal_details.length > 0 ? data.personal_details[0] : null,
         };
         this.userRole = data.role_as === 1 ? "admin" : "user";
 
@@ -139,7 +143,6 @@ export const useAuthStore = defineStore("authStore", {
         this.user = {
           ...data.user,
           role: data.role_as,
-          
         };
         this.userRole = data.role_as === 1 ? "admin" : "user";
 
@@ -173,7 +176,7 @@ export const useAuthStore = defineStore("authStore", {
         return { success: false, errors: data.errors }; // Return error details
       } else {
         this.errors = {};
-        localStorage.setItem("token", data.token);
+        //localStorage.setItem("token", data.token);
 
         this.user = {
           ...data.user,
@@ -184,15 +187,14 @@ export const useAuthStore = defineStore("authStore", {
         // Persist userRole in localStorage
         localStorage.setItem("userRole", this.userRole);
 
-        // Redirect to login after successful registration
         if (this.router) {
-          this.router.push({ name: "login" });
+          this.router.push({ name: "dashboard" });
         }
 
+        // Don't redirect here. Instead, rely on the navigation guard
         return { success: true }; // Return success flag
       }
     },
-
     async logout(): Promise<void> {
       const token = localStorage.getItem("token");
       if (token) {

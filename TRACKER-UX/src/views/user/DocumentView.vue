@@ -14,12 +14,15 @@ import MiniLink from "@/components/general/breadcrumb/MiniLink.vue";
 
 import { onMounted, ref } from "vue";
 import DocuTables from "@/components/documents/user/tables/DocuTables.vue";
-const documents = ref(docuStore.documents); // Local reactive state to store documents
+const document = ref(docuStore.document);
 
 onMounted(async () => {
-  await docuStore.fetchDocuments();
-  documents.value = docuStore.documents;
+  // await docuStore.fetchDocuments();
+  await docuStore.getDocuments();
+  document.value = docuStore.document;
 });
+
+console.log(docuStore.document);
 </script>
 
 <template>
@@ -50,7 +53,7 @@ onMounted(async () => {
               <h1 class="text-lg font-semibold md:text-2xl">Documents</h1>
             </div>
             <div
-              v-if="docuStore.documents.length === 0"
+              v-if="docuStore.document.length === 0"
               class="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm py-5"
             >
               <div class="flex flex-col items-center gap-3 text-center">
@@ -82,7 +85,6 @@ onMounted(async () => {
               </div>
             </div>
 
-           
             <div v-else>
               <DocuTables />
             </div>

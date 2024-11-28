@@ -31,25 +31,25 @@ const routes: Array<RouteRecordRaw> = [
     path: "/document",
     name: "document",
     component: DocumentMgtView,
-    meta: { requiresAuth: false, breadcrumb: "Document" },
+    meta: { requiresAuth: true, breadcrumb: "Document" },
   },
   {
     path: "/documents",
     name: "documents",
     component: DocumentView,
-    meta: { requiresAuth: false, breadcrumb: "Documents" },
+    meta: { requiresAuth: true, breadcrumb: "Documents" },
   },
   {
     path: "/users",
     name: "users",
     component: UserView,
-    meta: { requiresAuth: false, breadcrumb: "Users" },
+    meta: { requiresAuth: true, breadcrumb: "Users" },
   },
   {
     path: "/settings",
     name: "settings",
     component: SettingView,
-    meta: { requiresAuth: false, breadcrumb: "Settings" },
+    meta: { requiresAuth: true, breadcrumb: "Settings" },
   },
   {
     path: "/login",
@@ -70,13 +70,49 @@ const router = createRouter({
   routes,
 });
 
+// router.beforeEach(async (to, from, next) => {
+//   const loggedIn = isLoggedIn();
+//   const authStore = useAuthStore();
+
+//   // Skip checks for the login route or when explicitly navigating to it
+//   if (to.name === "login") {
+//     return next();
+//   }
+
+//   // Ensure user info is fetched if logged in
+//   if (loggedIn && !authStore.user) {
+//     await authStore.getUser();
+//   }
+
+//   if (to.meta.requiresAuth && !loggedIn) {
+//     return next({ name: "login" });
+//   }
+
+//   if (to.meta.guestOnly && loggedIn) {
+//     return next({ name: "dashboard" });
+//   }
+
+//   const userRole = authStore.userRole;
+//   const allowedRoutes = roleAccess[userRole] || [];
+
+//   if (!allowedRoutes.includes(to.name as string)) {
+//     return next({ name: "dashboard" });
+//   }
+
+//   next();
+// });
+
 router.beforeEach(async (to, from, next) => {
   const loggedIn = isLoggedIn();
   const authStore = useAuthStore();
 
   // Skip checks for the login route or when explicitly navigating to it
-  if (to.name === "login") {
-    return next();
+  if (to.name === "login" || to.name === "register") {
+    // If logged in, redirect to dashboard instead of allowing login/register
+    if (loggedIn) {
+      return next({ name: "dashboard" });
+    }
+    return next(); // Allow navigating to login/register if not logged in
   }
 
   // Ensure user info is fetched if logged in
@@ -84,22 +120,29 @@ router.beforeEach(async (to, from, next) => {
     await authStore.getUser();
   }
 
+  // Redirect to login page if the route requires auth and the user is not logged in
   if (to.meta.requiresAuth && !loggedIn) {
     return next({ name: "login" });
   }
 
+  // If the user is logged in but tries to visit a guest-only route, redirect to the dashboard
   if (to.meta.guestOnly && loggedIn) {
     return next({ name: "dashboard" });
   }
 
+  // Check user role and if they have access to the route
   const userRole = authStore.userRole;
   const allowedRoutes = roleAccess[userRole] || [];
 
+  // If the route is not allowed for the user's role, redirect to the dashboard
   if (!allowedRoutes.includes(to.name as string)) {
     return next({ name: "dashboard" });
   }
 
+  // Proceed with the navigation
   next();
 });
+
+
 
 export default router;

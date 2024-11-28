@@ -34,6 +34,13 @@ const register = async () => {
         description: "Registration successful. Please wait for admin approval.",
         class: "bg-green-500 text-white",
       });
+      formData.username = "";
+      formData.email = "";
+      formData.fname = "";
+      formData.lname = "";
+      formData.position = "";
+      formData.password = "";
+      formData.password_confirmation = "";
     } else {
       toast({
         description: "Registration failed. Please check the errors.",
