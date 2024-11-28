@@ -87,7 +87,7 @@ const isActive = (routeName: string) => route.name === routeName;
       class="flex items-center gap-3 rounded-lg px-3 py-2 transition-all"
       :class="{
         'bg-muted text-primary': isActive('settings'),
-        'text-muted-foreground hover:text-primary': !isActive('users'),
+        'text-muted-foreground hover:text-primary': !isActive('settings'),
       }"
     >
       <Settings class="h-4 w-4" />

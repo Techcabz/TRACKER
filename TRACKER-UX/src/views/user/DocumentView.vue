@@ -82,9 +82,8 @@ onMounted(async () => {
               </div>
             </div>
 
-            <!-- Show Documents if available -->
+           
             <div v-else>
-              <!-- Render your documents table or content here -->
               <DocuTables />
             </div>
           </div>
