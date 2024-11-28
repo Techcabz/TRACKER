@@ -57,4 +57,8 @@ class UserController extends Controller
 
         return response()->json(['message' => 'User not authenticated'], 401);
     }
+
+    public function UpdateStatusUser(){
+
+    }
 }

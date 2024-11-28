@@ -4,8 +4,8 @@ import AdminLayouts from "@/layouts/AdminLayouts.vue";
 import MiniLink from "@/components/general/breadcrumb/MiniLink.vue";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PendingTable from "@/components/users/admin/PendingTable.vue";
-import UserTables from "@/components/users/admin/UserTables.vue";
+import PendingTable from "@/components/users/PendingTable.vue";
+import UserTables from "@/components/users/UserTables.vue";
 </script>
 
 <template>

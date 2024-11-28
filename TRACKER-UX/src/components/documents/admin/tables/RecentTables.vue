@@ -8,6 +8,7 @@ import type {
 } from "@tanstack/vue-table";
 
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -24,7 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
+import { useDocuStore } from "@/stores/document";
 import { valueUpdater } from "@/utils";
 import { CaretSortIcon, ChevronDownIcon } from "@radix-icons/vue";
 import {
@@ -37,64 +38,47 @@ import {
   useVueTable,
 } from "@tanstack/vue-table";
 import { h, ref, onMounted, computed } from "vue";
-import { useUserStore } from "@/stores/user";
-import { Badge } from "@/components/ui/badge";
-import CustomDialog from "@/components/general/dialog/CustomDialog.vue";
-import { User } from "lucide-vue-next";
 
-const userStore = useUserStore();
-const users = ref(userStore.users);
+const docuStore = useDocuStore();
+const documents = ref(docuStore.documents);
 
-// Define the Users interface
-export interface Users {
+onMounted(async () => {
+  await docuStore.fetchDocuments();
+  documents.value = docuStore.documents;
+});
+
+export interface Documents {
   id: string;
-  username: string;
-  firstname: string;
-  lastname: string;
-  email: string;
-  position: string;
+  name: string;
   status: number;
+  category: string;
 }
 
 const statusMap = {
-  0: "Pending",
-  1: "Approved",
+  1: "Pending",
+  0: "Success",
+  2: "Processing",
+  3: "Failed",
 };
 
 const statusBadgeMap = {
   Pending: "default",
-  Approved: "secondary",
+  Success: "secondary",
+  Processing: "outline",
+  Failed: "destructive",
 };
 
-onMounted(async () => {
-  try {
-    await userStore.getUserList();
-    users.value = userStore.users;
-  } catch (error) {
-    console.error("Failed to fetch users:", error);
-  }
-});
-
-const filteredUsers = computed(() => {
-  return users.value.filter(
-    (users) => users.role_as === 0 && users.status === 1
+const filteredDocuments = computed(() => {
+  return documents.value.filter(
+    (document) => document.status === 1 || document.status === 2
   );
 });
 
-console.log(...users.value);
-const data: Users[] = [...filteredUsers.value];
+const data: Documents[] = [...filteredDocuments.value];
 
-const getDocumentById = (id: string) => {
-  return users.value.find((user) => user.id === id); // Assuming `users` is your list of documents
-};
-
-const isDialogOpen = ref(false);
-const selectedUserId = ref(User);
-
-// Define the columns for the table
-const columns: ColumnDef<Users>[] = [
+const columns: ColumnDef<Documents>[] = [
   {
-    accessorKey: "username",
+    accessorKey: "name",
     header: ({ column }) => {
       return h(
         Button,
@@ -102,40 +86,25 @@ const columns: ColumnDef<Users>[] = [
           variant: "ghost",
           onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
         },
-        () => ["Username", h(CaretSortIcon, { class: "ml-2 h-4 w-4" })]
+        () => ["Name", h(CaretSortIcon, { class: "ml-2 h-4 w-4" })]
+      );
+    },
+    cell: ({ row }) => h("div", { class: "lowercase" }, row.getValue("name")),
+  },
+  {
+    accessorKey: "category",
+    header: ({ column }) => {
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => ["Category", h(CaretSortIcon, { class: "ml-2 h-4 w-4" })]
       );
     },
     cell: ({ row }) =>
-      h("div", { class: "lowercase" }, row.getValue("username")),
-  },
-  {
-    accessorKey: "email",
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => ["Email", h(CaretSortIcon, { class: "ml-2 h-4 w-4" })]
-      );
-    },
-    cell: ({ row }) => h("div", { class: "lowercase" }, row.getValue("email")),
-  },
-  {
-    accessorKey: "position",
-    header: ({ column }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
-        },
-        () => ["Position", h(CaretSortIcon, { class: "ml-2 h-4 w-4" })]
-      );
-    },
-    cell: ({ row }) =>
-      h("div", { class: "lowercase" }, row.getValue("position")),
+      h("div", { class: "lowercase" }, row.getValue("category")),
   },
   {
     accessorKey: "status",
@@ -158,39 +127,19 @@ const columns: ColumnDef<Users>[] = [
         {
           variant: badgeVariant,
         },
-        () => statusString
+        () => statusString 
       );
     },
   },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const userID = row.original.id;
-      return h(
-        Button,
-        {
-          variant: "outline",
-          size: "sm",
-          class: "bg-grass11 text-white",
-          onClick: () => {
-          // Set the selected document ID
-            isDialogOpen.value = true; // Open the dialog
-          },
-        },
-        () => "View"
-      );
-    },
-  },
+ 
 ];
 
-// State for the table
 const sorting = ref<SortingState>([]);
 const columnFilters = ref<ColumnFiltersState>([]);
 const columnVisibility = ref<VisibilityState>({});
+const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
 
-// Setup table
 const table = useVueTable({
   data,
   columns,
@@ -204,6 +153,8 @@ const table = useVueTable({
     valueUpdater(updaterOrValue, columnFilters),
   onColumnVisibilityChange: (updaterOrValue) =>
     valueUpdater(updaterOrValue, columnVisibility),
+  onRowSelectionChange: (updaterOrValue) =>
+    valueUpdater(updaterOrValue, rowSelection),
   onExpandedChange: (updaterOrValue) => valueUpdater(updaterOrValue, expanded),
   state: {
     get sorting() {
@@ -215,6 +166,9 @@ const table = useVueTable({
     get columnVisibility() {
       return columnVisibility.value;
     },
+    get rowSelection() {
+      return rowSelection.value;
+    },
     get expanded() {
       return expanded.value;
     },
@@ -223,48 +177,13 @@ const table = useVueTable({
 </script>
 
 <template>
-  <CustomDialog
-    v-model:open="isDialogOpen"
-    title="Upload Documents"
-    description="Please upload your document files below."
-    closeText="Cancel"
-    saveText="Upload"
-  >
-    <template #default>
-      <div v-if="selectedDocumentId">
-        <!-- Find the selected document by id -->
-        <p>
-          <strong>Username:</strong>
-          {{ getDocumentById(selectedDocumentId)?.username }}
-        </p>
-        <p>
-          <strong>Email:</strong>
-          {{ getDocumentById(selectedDocumentId)?.email }}
-        </p>
-        <p>
-          <strong>Position:</strong>
-          {{ getDocumentById(selectedDocumentId)?.position }}
-        </p>
-        <p>
-          <strong>Status:</strong>
-          {{ statusMap[getDocumentById(selectedDocumentId)?.status || 0] }}
-        </p>
-      </div>
-      <div v-else>
-        <p>No document selected.</p>
-      </div>
-    </template>
-  </CustomDialog>
-
   <div class="w-full">
     <div class="flex items-center py-4">
       <Input
         class="max-w-sm"
-        placeholder="Filter users..."
-        :model-value="table.getColumn('username')?.getFilterValue() as string"
-        @update:model-value="
-          table.getColumn('username')?.setFilterValue($event)
-        "
+        placeholder="Filter documents..."
+        :model-value="table.getColumn('name')?.getFilterValue() as string"
+        @update:model-value="table.getColumn('name')?.setFilterValue($event)"
       />
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
@@ -310,7 +229,7 @@ const table = useVueTable({
         <TableBody>
           <template v-if="table.getRowModel().rows?.length">
             <template v-for="row in table.getRowModel().rows" :key="row.id">
-              <TableRow>
+              <TableRow :data-state="row.getIsSelected() && 'selected'">
                 <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
                   <FlexRender
                     :render="cell.column.columnDef.cell"
@@ -325,6 +244,7 @@ const table = useVueTable({
               </TableRow>
             </template>
           </template>
+
           <TableRow v-else>
             <TableCell :colspan="columns.length" class="h-24 text-center">
               No results.
@@ -360,3 +280,9 @@ const table = useVueTable({
     </div>
   </div>
 </template>
+
+<style lang="css" scoped>
+.lowercase {
+  margin-left: 15px !important;
+}
+</style>

@@ -40,6 +40,9 @@ import { h, ref, onMounted, computed } from "vue";
 import { useUserStore } from "@/stores/user";
 import { Badge } from "@/components/ui/badge";
 import CustomDialog from "@/components/general/dialog/CustomDialog.vue";
+import { User } from "lucide-vue-next";
+import DetailsForm from "./form/DetailsForm.vue";
+
 const userStore = useUserStore();
 const users = ref(userStore.users);
 
@@ -75,13 +78,19 @@ onMounted(async () => {
 
 const filteredUsers = computed(() => {
   return users.value.filter(
-    (users) => users.role_as === 0 && users.status === 0
+    (users) => users.role_as === 0 && users.status === 1
   );
 });
 
 const data: Users[] = [...filteredUsers.value];
 
+const selectedUser = computed(() =>
+  users.value.find((user) => user.id === selectedUserId.value)
+);
+
 const isDialogOpen = ref(false);
+const selectedUserId = ref<string>();
+
 // Define the columns for the table
 const columns: ColumnDef<Users>[] = [
   {
@@ -157,7 +166,7 @@ const columns: ColumnDef<Users>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const document = row.original;
+      const userData = row.original.id;
       return h(
         Button,
         {
@@ -165,8 +174,8 @@ const columns: ColumnDef<Users>[] = [
           size: "sm",
           class: "bg-grass11 text-white",
           onClick: () => {
-            // Set the selected document ID
-            isDialogOpen.value = true; // Open the dialog
+            selectedUserId.value = userData;
+            isDialogOpen.value = true; 
           },
         },
         () => "View"
@@ -211,19 +220,23 @@ const table = useVueTable({
     },
   },
 });
-
 </script>
 
 <template>
   <CustomDialog
     v-model:open="isDialogOpen"
-    title="Upload Documents"
-    description=""
+    title="User Information"
+    description="Below is the information about the user."
     closeText="Cancel"
     saveText="Upload"
   >
     <template #default>
-       
+      <div v-if="selectedUser">
+        <DetailsForm :selectedUser="selectedUser" />
+      </div>
+      <div v-else>
+        <p>No user selected.</p>
+      </div>
     </template>
   </CustomDialog>
 
@@ -331,3 +344,8 @@ const table = useVueTable({
     </div>
   </div>
 </template>
+<style lang="css" scoped>
+.lowercase {
+  margin-left: 10px;
+}
+</style>

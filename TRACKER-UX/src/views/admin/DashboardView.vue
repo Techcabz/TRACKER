@@ -40,6 +40,7 @@ import {
   FileClock,
 } from "lucide-vue-next";
 import DocuHistory from "@/components/documents/user/tables/DocuHistory.vue";
+import AdminTables from "@/components/documents/admin/tables/RecentTables.vue";
 import RecentTables from "@/components/documents/user/tables/RecentTables.vue";
 import { onMounted, computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
@@ -57,8 +58,6 @@ const isAdmin = computed(() => {
     return authStore.user?.role == "1";
   }
 });
-
-
 
 onMounted(() => {
   docuStore.fetchDocuments(); // Fetch document data on component mount
@@ -80,7 +79,6 @@ const totalApproved = computed(() => {
 const totalRejected = computed(() => {
   return docuStore.documents.filter((doc) => doc.status === 3).length;
 });
-
 </script>
 
 <template>
@@ -89,7 +87,9 @@ const totalRejected = computed(() => {
       <div class="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         <!-- Total Pending -->
         <Card>
-          <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader
+            class="flex flex-row items-center justify-between space-y-0 pb-2"
+          >
             <CardTitle class="text-sm font-medium">Total Pending</CardTitle>
             <FileClock class="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -100,7 +100,9 @@ const totalRejected = computed(() => {
 
         <!-- Total Process -->
         <Card>
-          <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader
+            class="flex flex-row items-center justify-between space-y-0 pb-2"
+          >
             <CardTitle class="text-sm font-medium">Total In Progress</CardTitle>
             <FileClock class="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -111,7 +113,9 @@ const totalRejected = computed(() => {
 
         <!-- Total Approved -->
         <Card>
-          <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader
+            class="flex flex-row items-center justify-between space-y-0 pb-2"
+          >
             <CardTitle class="text-sm font-medium">Total Approved</CardTitle>
             <FileCheck class="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -120,9 +124,11 @@ const totalRejected = computed(() => {
           </CardContent>
         </Card>
 
-         <!-- Total Approved -->
-         <Card>
-          <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+        <!-- Total Approved -->
+        <Card>
+          <CardHeader
+            class="flex flex-row items-center justify-between space-y-0 pb-2"
+          >
             <CardTitle class="text-sm font-medium">Total Rejected</CardTitle>
             <FileCheck class="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -132,7 +138,7 @@ const totalRejected = computed(() => {
         </Card>
       </div>
 
-      <div class="grid ">
+      <div class="grid">
         <Card class="xl:col-span-2">
           <CardHeader class="flex flex-row items-center">
             <div class="grid gap-2">
@@ -149,14 +155,19 @@ const totalRejected = computed(() => {
                 <ArrowUpRight class="h-4 w-4" />
               </router-link>
 
-               <router-link v-else :to="{ name: 'documents' }">
+              <router-link v-else :to="{ name: 'documents' }">
                 View All
                 <ArrowUpRight class="h-4 w-4" />
               </router-link>
             </Button>
           </CardHeader>
           <CardContent>
-            <RecentTables />
+            <div v-if="isAdmin">
+              <AdminTables />
+            </div>
+             <div v-else>
+              <RecentTables />
+            </div>
           </CardContent>
         </Card>
       </div>
