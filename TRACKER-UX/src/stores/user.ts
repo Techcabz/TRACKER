@@ -172,26 +172,30 @@ export const useUserStore = defineStore("userStore", {
     // Delete a user
     async deleteUser(userId: number): Promise<boolean> {
       const token = localStorage.getItem("token");
-      try {
-        if (token) {
-          const res = await fetch(`/api/users/${userId}`, {
-            method: "DELETE",
-            headers: {
-              authorization: `Bearer ${token}`,
-            },
-          });
 
-          if (res.ok) {
-            console.log(`User with id ${userId} deleted`);
-            return true;
-          } else {
-            const data = await res.json();
-            this.errors = data.errors || {};
-            console.error("Failed to delete user:", data.errors);
-            return false;
-          }
+      if (!token) {
+        console.error("No token found");
+        return false;
+      }
+
+      try {
+        const res = await fetch(`/api/users/${userId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (res.ok) {
+          console.log(`User with id ${userId} deleted`);
+          return true;
         } else {
-          console.error("No token found");
+          const data = await res.json();
+          console.error(
+            "Failed to delete user:",
+            data.message || "Unknown error"
+          );
           return false;
         }
       } catch (error) {
