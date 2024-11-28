@@ -147,7 +147,7 @@ const totalRejected = computed(() => {
         </Card>
       </div>
 
-      <div class="grid">
+      <div class="grid" v-if="!isNoTHighUser">
         <Card class="xl:col-span-2">
           <CardHeader class="flex flex-row items-center">
             <div class="grid gap-2">
