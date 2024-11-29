@@ -96,7 +96,7 @@ const isDialogOpenRef = toRef(props, "isDialogOpen");
 
 const filteredDocuments = computed(() => {
   return document.value.filter(
-    (document) => document.status === 0 || document.status === 1
+    (document) => document.status === 0 || document.status === 1 || document.status === 2
   );
 });
 
