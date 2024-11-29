@@ -52,6 +52,7 @@ onMounted(() => {
   authStore.getUser();
   docuStore.fetchDocuments();
 });
+const ownerId = authStore.user?.id;
 
 const isAdmin = computed(() => {
   if (authStore.user) {
@@ -67,9 +68,29 @@ const isNoTHighUser = computed(() => {
     );
   }
 });
+// Individual User
+const totalUPending = computed(() => {
+  return docuStore.documents.filter(
+    (doc) => doc.status === 0 && doc.owner_id === ownerId
+  ).length;
+});
 
-onMounted(() => {
-  docuStore.fetchDocuments(); // Fetch document data on component mount
+const totalUProcess = computed(() => {
+  return docuStore.documents.filter(
+    (doc) => doc.status === 1 && doc.owner_id === ownerId
+  ).length;
+});
+
+const totalUApproved = computed(() => {
+  return docuStore.documents.filter(
+    (doc) => doc.status === 3 && doc.owner_id === ownerId
+  ).length;
+});
+
+const totalURejected = computed(() => {
+  return docuStore.documents.filter(
+    (doc) => doc.status === 4 && doc.owner_id === ownerId
+  ).length;
 });
 
 // Computed properties for document counts
@@ -93,7 +114,10 @@ const totalRejected = computed(() => {
 <template>
   <AdminLayouts>
     <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-      <div class="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4" >
+      <div
+        v-if="isAdmin || isNoTHighUser"
+        class="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4"
+      >
         <!-- Total Pending -->
         <Card>
           <CardHeader
@@ -147,6 +171,59 @@ const totalRejected = computed(() => {
         </Card>
       </div>
 
+      <div v-else class="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+        <Card>
+          <CardHeader
+            class="flex flex-row items-center justify-between space-y-0 pb-2"
+          >
+            <CardTitle class="text-sm font-medium">Total Pending</CardTitle>
+            <FileClock class="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div class="text-4xl font-bold">{{ totalUPending }}</div>
+          </CardContent>
+        </Card>
+
+        <!-- Total Process -->
+        <Card>
+          <CardHeader
+            class="flex flex-row items-center justify-between space-y-0 pb-2"
+          >
+            <CardTitle class="text-sm font-medium">Total In Progress</CardTitle>
+            <FileClock class="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div class="text-4xl font-bold">{{ totalUProcess }}</div>
+          </CardContent>
+        </Card>
+
+        <!-- Total Approved -->
+        <Card>
+          <CardHeader
+            class="flex flex-row items-center justify-between space-y-0 pb-2"
+          >
+            <CardTitle class="text-sm font-medium">Total Approved</CardTitle>
+            <FileCheck class="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div class="text-4xl font-bold">{{ totalUApproved }}</div>
+          </CardContent>
+        </Card>
+
+        <!-- Total Approved -->
+        <Card>
+          <CardHeader
+            class="flex flex-row items-center justify-between space-y-0 pb-2"
+          >
+            <CardTitle class="text-sm font-medium">Total Rejected</CardTitle>
+            <FileCheck class="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div class="text-4xl font-bold">{{ totalURejected }}</div>
+          </CardContent>
+        </Card>
+      </div>
+
       <div class="grid" v-if="!isNoTHighUser">
         <Card class="xl:col-span-2">
           <CardHeader class="flex flex-row items-center">
@@ -174,7 +251,7 @@ const totalRejected = computed(() => {
             <div v-if="isAdmin">
               <AdminTables />
             </div>
-             <div v-else>
+            <div v-else>
               <RecentTables />
             </div>
           </CardContent>

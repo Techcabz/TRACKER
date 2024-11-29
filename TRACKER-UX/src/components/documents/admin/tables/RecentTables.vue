@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-
+import CustomDialog from "@/components/general/dialog/CustomDialog.vue";
 import {
   Table,
   TableBody,
@@ -41,10 +41,17 @@ import { h, ref, onMounted, computed } from "vue";
 
 const docuStore = useDocuStore();
 const documents = ref(docuStore.documents);
+const isLoading = ref(true);
 
 onMounted(async () => {
-  await docuStore.fetchDocuments();
-  documents.value = docuStore.documents;
+  try {
+    await docuStore.fetchDocuments();
+    documents.value = docuStore.documents;
+    isLoading.value = false;
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    isLoading.value = false;
+  }
 });
 
 export interface Documents {
@@ -70,14 +77,18 @@ const statusBadgeMap = {
   Failed: "destructive",
 };
 
-
 const filteredDocuments = computed(() => {
   return documents.value.filter(
-    (document) => document.status === 0 || document.status === 1 || document.status === 2
+    (documents) =>
+      documents.status === 0 || documents.status === 1 || documents.status === 2
   );
 });
 
-const data: Documents[] = [...filteredDocuments.value];
+const selectedDocument = computed(() =>
+  documents.value.find((document) => document.id === selectedDocuId.value)
+);
+
+const selectedDocuId = ref<string>();
 
 const columns: ColumnDef<Documents>[] = [
   {
@@ -130,11 +141,10 @@ const columns: ColumnDef<Documents>[] = [
         {
           variant: badgeVariant,
         },
-        () => statusString 
+        () => statusString
       );
     },
   },
- 
 ];
 
 const sorting = ref<SortingState>([]);
@@ -144,7 +154,7 @@ const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
 
 const table = useVueTable({
-  data,
+  data: filteredDocuments,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -180,7 +190,7 @@ const table = useVueTable({
 </script>
 
 <template>
-  <div class="w-full">
+  <div v-if="!isLoading" class="w-full">
     <div class="flex items-center py-4">
       <Input
         class="max-w-sm"
@@ -281,6 +291,9 @@ const table = useVueTable({
         </Button>
       </div>
     </div>
+  </div>
+  <div v-else class="flex justify-center items-center h-48">
+    <p>Loading...</p>
   </div>
 </template>
 

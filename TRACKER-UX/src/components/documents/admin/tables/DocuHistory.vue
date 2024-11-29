@@ -207,6 +207,7 @@ const table = useVueTable({
     },
   },
 });
+
 </script>
 
 <template>
