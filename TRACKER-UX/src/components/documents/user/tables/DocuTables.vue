@@ -38,7 +38,7 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import { h, ref, onMounted, computed, defineProps, toRef, watch } from "vue";
+import { h, ref, onMounted, computed, defineProps, toRef, PropType } from "vue";
 import StatusPage from "../status/StatusPage.vue";
 import DocuDialog1 from "../dialog/DocuDialog1.vue";
 import DocuUpload from "../form/DocuUpload.vue";
@@ -87,7 +87,7 @@ const props = defineProps({
     required: true,
   },
   closeDialog: {
-    type: Function,
+    type: Function as PropType<() => void>,
     required: true,
   },
 });
@@ -257,12 +257,12 @@ const refreshDocuments = async () => {
 
   <DocuDialog1
     v-model:open="isDialogOpenRef"
-    title="Document Information"
-    description="Information about documents with a status"
+    title="Upload Documents"
+    description="Please upload your document files below."
     closeText="Cancel"
     saveText="Approved"
   >
-    <DocuUpload :closeDialog="closeDialog"  @refresh-docu="refreshDocuments" />
+    <DocuUpload :closeDialog="closeDialog" @refresh-docu="refreshDocuments" />
   </DocuDialog1>
 
   <div v-if="!isLoading" class="w-full">

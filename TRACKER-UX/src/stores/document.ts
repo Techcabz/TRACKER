@@ -87,7 +87,7 @@ export const useDocuStore = defineStore("docuStore", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(formData), 
         });
 
         if (!response.ok) {
@@ -96,16 +96,15 @@ export const useDocuStore = defineStore("docuStore", {
         }
 
         const data = await response.json();
-        this.documents.push(data); // Add the uploaded document to the state
+        this.documents.push(data);
         return data;
-      } catch (error: any) {
+      } catch (error) {
         this.errors = error.message || "Failed to upload document.";
         throw error;
       } finally {
         this.isLoading = false;
       }
     },
-
     removeDocument(documentId: number) {
       this.documents = this.documents.filter((doc) => doc.id !== documentId);
     },

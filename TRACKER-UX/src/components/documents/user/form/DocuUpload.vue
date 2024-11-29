@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DialogClose } from "radix-vue";
-import { reactive, defineProps, defineEmits } from "vue";
+import { reactive, defineProps, defineEmits, ref, PropType } from "vue";
 import { useDocuStore } from "@/stores/document";
-import Button from "@/components/ui/button/Button.vue";
 import { useToast } from "@/components/ui/toast/use-toast";
+import { Button } from "@/components/ui/button";
 
 const docuStore = useDocuStore();
 const emit = defineEmits(["refresh-docu"]);
@@ -28,10 +27,12 @@ const myWidget = cloudinary.createUploadWidget(
 
 const props = defineProps({
   closeDialog: {
-    type: Function,
+    type: Function as PropType<() => void>,
     required: true,
   },
 });
+
+const isLoading = ref(false);
 
 const openWidget = () => {
   myWidget.open();
@@ -45,22 +46,29 @@ const uploadFile = async () => {
   try {
     const formDataToSend = new FormData();
 
-    formDataToSend.append("name", JSON.stringify(formData.name));
+    formDataToSend.append("name", formData.name); // Removed JSON.stringify as FormData handles it natively
     formDataToSend.append("category", formData.category);
 
-    await docuStore.uploadDocument(formData);
+    const response = await docuStore.uploadDocument(formData);
 
     toast({
       description: "Upload successfully.",
       class: "bg-green-500 text-white",
     });
+
     emit("refresh-docu");
     props.closeDialog();
+
+    // Clear the form data
     formData.name = "";
     formData.category = "";
   } catch (error) {
-    console.error("Upload failed:", error);
-    alert("Upload failed. Please try again.");
+    toast({
+      description: error.message || "Upload failed. Please try again.",
+      class: "bg-red-500 text-white",
+    });
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>
@@ -95,21 +103,23 @@ const uploadFile = async () => {
 
     <!-- Buttons -->
     <div class="mt-[25px] flex gap-4 justify-end">
-      <DialogClose as-child>
-        <button
-          type="button"
-          class="bg-red4 text-red11 hover:bg-red5 focus:shadow-red4 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none focus:shadow-[0_0_0_2px] focus:outline-none"
-        >
-          Cancel
-        </button>
-      </DialogClose>
+      <Button
+        type="button"
+        @click="props.closeDialog"
+        class="bg-red4 text-red11 hover:bg-red5 focus:shadow-red4 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none focus:shadow-[0_0_0_2px] focus:outline-none"
+      >
+        Cancel
+      </Button>
 
-      <button
+      <Button
         type="submit"
+        :disabled="isLoading"
         class="bg-green4 text-green11 hover:bg-green5 focus:shadow-green7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none focus:shadow-[0_0_0_2px] focus:outline-none"
       >
-        Upload
-      </button>
+        <span v-if="isLoading">Uploading...</span>
+
+        <span v-else>Upload</span>
+      </Button>
     </div>
   </form>
 </template>

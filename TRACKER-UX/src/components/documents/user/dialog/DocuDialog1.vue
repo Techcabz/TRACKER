@@ -64,12 +64,7 @@ const emit = defineEmits(["update:modelValue"]);
         <slot />
         <!-- content form end -->
 
-        <DialogClose
-          class="text-grass11 hover:bg-green4 focus:shadow-green7 absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:shadow-[0_0_0_2px] focus:outline-none"
-          aria-label="Close"
-        >
-          x
-        </DialogClose>
+        
       </DialogContent>
     </DialogPortal>
   </DialogRoot>

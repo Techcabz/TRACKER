@@ -27,6 +27,10 @@ module.exports = {
         20: '20.5em', // This is the width for w-50 (200px as an example)
       },
       colors: {
+        ...blackA,
+        ...grass,
+        ...green,
+        ...red,
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

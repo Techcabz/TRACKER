@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {
-  Stepper,
   StepperDescription,
   StepperIndicator,
   StepperItem,
+  StepperRoot,
   StepperSeparator,
   StepperTitle,
   StepperTrigger,
-} from "@/components/ui/stepper";
+} from "radix-vue";
 
 import {
   FilePlus,
@@ -25,7 +25,7 @@ onMounted(() => {
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { defineProps, defineEmits } from "vue";
+import { defineProps } from "vue";
 import { Input } from "@/components/ui/input";
 import Label from "@/components/ui/label/Label.vue";
 import { Button } from "@/components/ui/button";
@@ -40,25 +40,25 @@ const isNoTHighUser = computed(() => {
 
 const steps = [
   {
-    step: 1,
+    step: 0,
     title: "Faculty",
     description: "Upload the required documents for review.",
     icon: FilePlus,
   },
   {
-    step: 2,
+    step: 1,
     title: "Chairman",
     description: "Review the uploaded documents for accuracy and validity.",
     icon: ClipboardCheck,
   },
   {
-    step: 3,
+    step: 2,
     title: "Dean",
     description: "Approve the documents after final verification.",
     icon: FileCheck,
   },
   {
-    step: 4,
+    step: 3,
     title: "Done",
     description: "The document submission process is complete.",
     icon: CheckCircle,
@@ -75,43 +75,69 @@ const props = defineProps<{
   };
 }>();
 
-console.log(props.selectedDocument.name);
+const currentStep = ref(Number(props.selectedDocument.status));
 
-const currentStep = ref(2);
+const canApproveAsChairman = computed(() => {
+  return (
+    authStore.user?.personalDetails?.position === "chairman" &&
+    Number(props.selectedDocument.status) === 0
+  );
+});
+
+const canApproveAsDean = computed(() => {
+  return (
+    authStore.user?.personalDetails?.position === "dean" &&
+    Number(props.selectedDocument.status) === 1
+  );
+});
+
+const approveAsChairman = () => {
+  props.selectedDocument.status = "1";
+};
+
+const approveAsDean = () => {
+  props.selectedDocument.status = "2";
+};
 </script>
 
 <template>
-  <Stepper class="mb-3">
+  <StepperRoot
+    :default-value="currentStep"
+    :class="[
+      'flex gap-2 m-auto w-full max-w-[32rem]',
+      isNoTHighUser ? 'py-5' : 'py-40',
+    ]"
+  >
     <StepperItem
       v-for="item in steps"
       :key="item.step"
-      class="basis-1/4"
+      class="w-full flex justify-center gap-2 cursor-pointer group relative px-4"
       :step="item.step"
+      :disabled="true"
     >
       <StepperTrigger
-        :class="{
-          'pointer-events-none opacity-100': item.step !== currentStep,
-        }"
+        class="inline-flex items-center justify-center rounded-full w-10 h-10 bg-gray-300 text-white group-data-[state=active]:bg-green11 group-data-[state=active]:text-white group-data-[state=completed]:bg-white group-data-[state=completed]:text-green10"
       >
-        <StepperIndicator>
-          <component :is="item.icon" class="w-4 h-4" />
+        <StepperIndicator class="flex justify-center items-center w-6 h-6">
+          <component :is="item.icon" class="w-5 h-5 text-white" />
         </StepperIndicator>
-        <div class="flex flex-col">
-          <StepperTitle>
-            {{ item.title }}
-          </StepperTitle>
-          <StepperDescription>
-            {{ item.description }}
-          </StepperDescription>
-        </div>
       </StepperTrigger>
       <StepperSeparator
         v-if="item.step !== steps[steps.length - 1].step"
-        class="w-full h-px"
+        class="absolute top-5 left-[calc(50%+30px)] right-[calc(-50%+20px)] h-0.5 bg-gray-300"
       />
+      <div class="absolute text-center top-full left-0 w-full mt-2">
+        <StepperTitle class="font-medium text-grass12">{{
+          item.title
+        }}</StepperTitle>
+        <StepperDescription class="hidden sm:block text-xs text-grass12">{{
+          item.description
+        }}</StepperDescription>
+      </div>
     </StepperItem>
-  </Stepper>
-  <div v-if="isNoTHighUser">
+  </StepperRoot>
+
+  <div v-if="isNoTHighUser" class="custom-m">
     <Separator class="my-4" label="Documents Information" />
     <Card>
       <CardContent>
@@ -133,11 +159,28 @@ const currentStep = ref(2);
         </div>
       </CardContent>
     </Card>
-    <div class="flex justify-end my-2">
+    <div v-if="canApproveAsChairman" class="flex justify-end my-2">
       <Button
         class="relative uppercase bg-grass11 text-white rounded hover:bg-grass11 focus:ring-2 focus:ring-grass11 focus:ring-offset-2 focus:outline-none"
-        >Approved as {{ authStore.user?.personalDetails?.position }}</Button
+        @click="approveAsChairman"
       >
+        Approve as Chairman
+      </Button>
+    </div>
+
+    <!-- Dean approval button (visible when status is 1 and user is Dean) -->
+    <div v-if="canApproveAsDean" class="flex justify-end my-2">
+      <Button
+        class="relative uppercase bg-grass11 text-white rounded hover:bg-grass11 focus:ring-2 focus:ring-grass11 focus:ring-offset-2 focus:outline-none"
+        @click="approveAsDean"
+      >
+        Approve as Dean
+      </Button>
     </div>
   </div>
 </template>
+<style lang="css" scoped>
+.custom-m {
+  margin-top: 120px;
+}
+</style>

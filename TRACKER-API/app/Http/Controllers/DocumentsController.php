@@ -35,6 +35,20 @@ class DocumentsController extends Controller implements HasMiddleware
             'name' => 'required|max:255',
             'category' => 'required|max:255',
         ]);
+
+
+
+        $existingDocument = Documents::where('name', $fields['name'])
+            ->where('category', $fields['category'])
+            ->first();
+
+        if ($existingDocument) {
+            return response()->json([
+                'message' => 'A document with the same name and category already exists.',
+                'document_id' => $existingDocument->id,
+            ], 400);
+        }
+
         $document = new Documents();
         $document->name = $fields['name'];
         $document->category = $fields['category'];
