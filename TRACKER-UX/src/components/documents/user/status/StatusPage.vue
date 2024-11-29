@@ -50,7 +50,7 @@ const currentStep = ref(2);
       class="basis-1/4"
       :step="item.step"
     >
-      <StepperTrigger  :class="{ 'pointer-events-none opacity-100': item.step !== currentStep }">
+      <StepperTrigger :class="{ 'pointer-events-none opacity-100': item.step !== currentStep }">
         <StepperIndicator>
           <component :is="item.icon" class="w-4 h-4" />
         </StepperIndicator>

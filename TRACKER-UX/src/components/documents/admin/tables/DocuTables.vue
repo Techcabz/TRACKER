@@ -42,10 +42,19 @@ import StatusPage from "../../user/status/StatusPage.vue";
 
 const docuStore = useDocuStore();
 const documents = ref(docuStore.documents);
+const isLoading = ref(true);
+const selectedDocuId = ref<string>();
+const isDialogOpen = ref(false);
 
 onMounted(async () => {
-  await docuStore.fetchDocuments();
-  documents.value = docuStore.documents;
+  try {
+    await docuStore.fetchDocuments();
+    documents.value = docuStore.documents;
+    isLoading.value = false;
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    isLoading.value = false;
+  }
 });
 
 export interface Documents {
@@ -77,9 +86,9 @@ const filteredDocuments = computed(() => {
   );
 });
 
-const isDialogOpen = ref(false);
-const selectedDocuId = ref<string>();
-const data: Documents[] = [...filteredDocuments.value];
+const selectedDocument = computed(() =>
+  documents.value.find((document) => document.id === selectedDocuId.value)
+);
 
 const columns: ColumnDef<Documents>[] = [
   {
@@ -140,7 +149,7 @@ const columns: ColumnDef<Documents>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const document = row.original;
+      const document = row.original.id;
       return h(
         Button,
         {
@@ -165,7 +174,7 @@ const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
 
 const table = useVueTable({
-  data,
+  data: filteredDocuments,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -218,7 +227,7 @@ const table = useVueTable({
     </template>
   </CustomDialog>
 
-  <div class="w-full">
+  <div v-if="!isLoading"  class="w-full">
     <div class="flex items-center py-4">
       <Input
         class="max-w-sm"
@@ -319,6 +328,10 @@ const table = useVueTable({
         </Button>
       </div>
     </div>
+  </div>
+
+  <div v-else class="flex justify-center items-center h-48">
+    <p>Loading...</p>
   </div>
 </template>
 
