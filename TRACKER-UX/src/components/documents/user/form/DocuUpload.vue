@@ -2,15 +2,17 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DialogClose } from "radix-vue";
-import { reactive } from "vue";
+import { reactive, defineProps, defineEmits } from "vue";
 import { useDocuStore } from "@/stores/document";
 import Button from "@/components/ui/button/Button.vue";
+import { useToast } from "@/components/ui/toast/use-toast";
 
 const docuStore = useDocuStore();
-
+const emit = defineEmits(["refresh-docu"]);
+const { toast } = useToast();
 // cloud config
-const cloudName = 'dqzl4gicv';
-const uploadPreset = 'banner';
+const cloudName = "dqzl4gicv";
+const uploadPreset = "banner";
 
 const myWidget = cloudinary.createUploadWidget(
   {
@@ -23,6 +25,13 @@ const myWidget = cloudinary.createUploadWidget(
     }
   }
 );
+
+const props = defineProps({
+  closeDialog: {
+    type: Function,
+    required: true,
+  },
+});
 
 const openWidget = () => {
   myWidget.open();
@@ -41,8 +50,12 @@ const uploadFile = async () => {
 
     await docuStore.uploadDocument(formData);
 
-    alert("Document uploaded successfully!");
-
+    toast({
+      description: "Upload successfully.",
+      class: "bg-green-500 text-white",
+    });
+    emit("refresh-docu");
+    props.closeDialog();
     formData.name = "";
     formData.category = "";
   } catch (error) {

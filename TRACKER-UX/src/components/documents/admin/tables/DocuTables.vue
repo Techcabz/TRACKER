@@ -81,7 +81,7 @@ const statusBadgeMap = {
 const filteredDocuments = computed(() => {
   return documents.value.filter(
     (documents) =>
-      documents.status === 0 || documents.status === 1 || documents.status === 2
+      documents.status === 3 
   );
 });
 

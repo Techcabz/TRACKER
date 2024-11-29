@@ -38,8 +38,10 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import { h, ref, onMounted, computed } from "vue";
+import { h, ref, onMounted, computed, defineProps, toRef, watch } from "vue";
 import StatusPage from "../status/StatusPage.vue";
+import DocuDialog1 from "../dialog/DocuDialog1.vue";
+import DocuUpload from "../form/DocuUpload.vue";
 
 const docuStore = useDocuStore();
 const document = ref(docuStore.document);
@@ -78,6 +80,19 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
+
+const props = defineProps({
+  isDialogOpen: {
+    type: Boolean,
+    required: true,
+  },
+  closeDialog: {
+    type: Function,
+    required: true,
+  },
+});
+
+const isDialogOpenRef = toRef(props, "isDialogOpen");
 
 const filteredDocuments = computed(() => {
   return document.value.filter(
@@ -209,6 +224,17 @@ const table = useVueTable({
     },
   },
 });
+
+const refreshDocuments = async () => {
+  isLoading.value = true;
+  try {
+    await docuStore.getDocuments();
+    document.value = docuStore.document;
+    isLoading.value = false;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+  }
+};
 </script>
 
 <template>
@@ -228,6 +254,16 @@ const table = useVueTable({
       </div>
     </template>
   </CustomDialog>
+
+  <DocuDialog1
+    v-model:open="isDialogOpenRef"
+    title="Document Information"
+    description="Information about documents with a status"
+    closeText="Cancel"
+    saveText="Approved"
+  >
+    <DocuUpload :closeDialog="closeDialog"  @refresh-docu="refreshDocuments" />
+  </DocuDialog1>
 
   <div v-if="!isLoading" class="w-full">
     <div class="flex items-center py-4">

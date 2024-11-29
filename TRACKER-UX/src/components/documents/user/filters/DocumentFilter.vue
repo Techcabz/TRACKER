@@ -8,12 +8,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 import { File, ListFilter, PlusCircle } from "lucide-vue-next";
 import DocuDialog from "../dialog/DocuDialog.vue";
 import DocuUpload from "../form/DocuUpload.vue";
+import { defineEmits } from "vue";
+
+const emit = defineEmits(["update:isDialogOpen"]);
+
+const openDialog = () => {
+  emit("update:isDialogOpen", true);
+};
 </script>
 <template>
   <div class="ml-auto flex items-center gap-2">
@@ -41,8 +46,17 @@ import DocuUpload from "../form/DocuUpload.vue";
           Export
         </span>
       </Button> -->
-
-    <DocuDialog
+    <Button
+      size="sm"
+      @click="openDialog"
+      class="h-7 bg-grass11 gap-1 text-white rounded hover:bg-grass11 focus:ring-2 focus:ring-grass11 focus:ring-offset-2 focus:outline-none"
+    >
+      <PlusCircle class="h-3.5 w-3.5 text-white" />
+      <span class="sr-only sm:not-sr-only sm:whitespace-nowrap">
+        Upload Documents
+      </span>
+    </Button>
+    <!-- <DocuDialog
       title="Upload Documents"
       description="Please upload your document files below."
       closeText="Cancel"
@@ -63,6 +77,6 @@ import DocuUpload from "../form/DocuUpload.vue";
       <template #default>
         <DocuUpload />
       </template>
-    </DocuDialog>
+    </DocuDialog> -->
   </div>
 </template>

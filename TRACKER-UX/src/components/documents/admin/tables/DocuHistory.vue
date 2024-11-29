@@ -82,7 +82,8 @@ const statusBadgeMap = {
 
 const filteredDocuments = computed(() => {
   return documents.value.filter(
-    (document) => document.status === 3 || document.status === 4
+    (document) =>
+      document.status === 0 || document.status === 1 || document.status === 2
   );
 });
 
@@ -207,7 +208,6 @@ const table = useVueTable({
     },
   },
 });
-
 </script>
 
 <template>
@@ -220,7 +220,7 @@ const table = useVueTable({
   >
     <template #default>
       <div v-if="filteredDocuments">
-        <StatusPage />
+        <StatusPage :selectedDocument="selectedDocument" />
       </div>
       <div v-else>
         <p>No user selected.</p>

@@ -23,8 +23,8 @@ import MiniLink from "@/components/general/breadcrumb/MiniLink.vue";
         <div class="flex">
           <div class="md:flex items-center">
             <TabsList>
-              <TabsTrigger value="upload">New Document </TabsTrigger>
-              <TabsTrigger value="history"> Document History </TabsTrigger>
+              <TabsTrigger value="upload">Approved Document </TabsTrigger>
+              <TabsTrigger value="history">Under Review</TabsTrigger>
             </TabsList>
           </div>
         </div>

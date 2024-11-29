@@ -24,7 +24,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { valueUpdater } from "@/utils";
 import { CaretSortIcon, ChevronDownIcon } from "@radix-icons/vue";
 import {

@@ -2,7 +2,6 @@
 import DocuDialog from "@/components/documents/user/dialog/DocuDialog.vue";
 import DocumentFilter from "@/components/documents/user/filters/DocumentFilter.vue";
 import DocuUpload from "@/components/documents/user/form/DocuUpload.vue";
-
 import Button from "@/components/ui/button/Button.vue";
 import Separator from "@/components/ui/separator/Separator.vue";
 import AdminLayouts from "@/layouts/AdminLayouts.vue";
@@ -12,9 +11,10 @@ const docuStore = useDocuStore();
 import DocuHistory from "@/components/documents/user/tables/DocuHistory.vue";
 import MiniLink from "@/components/general/breadcrumb/MiniLink.vue";
 import { useAuthStore } from "@/stores/auth";
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import DocuTables from "@/components/documents/user/tables/DocuTables.vue";
 import HDocuTables from "@/components/documents/huser/DocuTables.vue";
+
 const document = ref(docuStore.document);
 const authStore = useAuthStore();
 
@@ -24,7 +24,7 @@ onMounted(async () => {
   authStore.getUser();
   document.value = docuStore.document;
 });
-
+const isDialogOpen = ref(false);
 const isNoTHighUser = computed(() => {
   if (authStore.user) {
     return (
@@ -33,6 +33,10 @@ const isNoTHighUser = computed(() => {
     );
   }
 });
+
+const closeDialog = () => {
+  isDialogOpen.value = false;
+};
 </script>
 
 <template>
@@ -54,7 +58,9 @@ const isNoTHighUser = computed(() => {
               <TabsTrigger value="history"> Document History </TabsTrigger>
             </TabsList>
           </div>
-          <DocumentFilter />
+          <DocumentFilter
+            @update:isDialogOpen="(value) => (isDialogOpen = value)"
+          />
         </div>
         <!-- Content -->
         <TabsContent value="upload">
@@ -96,7 +102,10 @@ const isNoTHighUser = computed(() => {
             </div>
 
             <div v-else>
-              <DocuTables />
+              <DocuTables
+                v-model:isDialogOpen="isDialogOpen"
+                :closeDialog="closeDialog"
+              />
             </div>
           </div>
         </TabsContent>
@@ -106,7 +115,7 @@ const isNoTHighUser = computed(() => {
       </Tabs>
 
       <div v-else>
-       <HDocuTables/>
+        <HDocuTables />
       </div>
     </div>
   </AdminLayouts>
