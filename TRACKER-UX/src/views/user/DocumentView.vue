@@ -13,7 +13,8 @@ import DocuHistory from "@/components/documents/user/tables/DocuHistory.vue";
 import MiniLink from "@/components/general/breadcrumb/MiniLink.vue";
 import { useAuthStore } from "@/stores/auth";
 import { onMounted, ref, computed } from "vue";
-import DocuTables from "@/components/documents/admin/tables/DocuTables.vue";
+import DocuTables from "@/components/documents/user/tables/DocuTables.vue";
+import HDocuTables from "@/components/documents/huser/DocuTables.vue";
 const document = ref(docuStore.document);
 const authStore = useAuthStore();
 
@@ -105,7 +106,7 @@ const isNoTHighUser = computed(() => {
       </Tabs>
 
       <div v-else>
-        <DocuTables />
+       <HDocuTables/>
       </div>
     </div>
   </AdminLayouts>

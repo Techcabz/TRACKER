@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string("category");
             $table->string('file_path');
-            $table->tinyInteger('status')->default('0')->comment('0=granted.1=pending');
+            $table->tinyInteger('status')->default('0')->comment('0=pending,1=inprogress,2=verify.3=success,4=failed');
             $table->foreignId('owner_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });

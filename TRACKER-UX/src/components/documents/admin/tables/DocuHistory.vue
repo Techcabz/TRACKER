@@ -65,24 +65,24 @@ export interface Documents {
 }
 
 const statusMap = {
-  1: "Pending",
-  0: "Success",
-  4: "InProgress",
-  2: "Processing",
-  3: "Failed",
+  0: "Pending",
+  1: "InProgress",
+  2: "Verify",
+  3: "Success",
+  4: "Failed",
 };
 
 const statusBadgeMap = {
   Pending: "default",
-  Success: "secondary",
-  InProgress: "outline",
-  Processing: "outline",
+  InProgress: "secondary",
+  Verify: "outline",
+  Success: "outline",
   Failed: "destructive",
 };
 
 const filteredDocuments = computed(() => {
   return documents.value.filter(
-    (document) => document.status === 0 || document.status === 3
+    (document) => document.status === 3 || document.status === 4
   );
 });
 
@@ -227,7 +227,7 @@ const table = useVueTable({
     </template>
   </CustomDialog>
 
-  <div v-if="!isLoading"  class="w-full">
+  <div v-if="!isLoading" class="w-full">
     <div class="flex items-center py-4">
       <Input
         class="max-w-sm"

@@ -74,19 +74,19 @@ onMounted(() => {
 
 // Computed properties for document counts
 const totalPending = computed(() => {
-  return docuStore.documents.filter((doc) => doc.status === 1).length;
-});
-
-const totalProcess = computed(() => {
-  return docuStore.documents.filter((doc) => doc.status === 2).length;
-});
-
-const totalApproved = computed(() => {
   return docuStore.documents.filter((doc) => doc.status === 0).length;
 });
 
-const totalRejected = computed(() => {
+const totalProcess = computed(() => {
+  return docuStore.documents.filter((doc) => doc.status === 1).length;
+});
+
+const totalApproved = computed(() => {
   return docuStore.documents.filter((doc) => doc.status === 3).length;
+});
+
+const totalRejected = computed(() => {
+  return docuStore.documents.filter((doc) => doc.status === 4).length;
 });
 </script>
 

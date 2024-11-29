@@ -55,22 +55,25 @@ export interface Documents {
 }
 
 const statusMap = {
-  1: "Pending",
-  0: "Success",
-  2: "Processing",
-  3: "Failed",
+  0: "Pending",
+  1: "InProgress",
+  2: "Verify",
+  3: "Success",
+  4: "Failed",
 };
 
 const statusBadgeMap = {
   Pending: "default",
-  Success: "secondary",
-  Processing: "outline",
+  InProgress: "secondary",
+  Verify: "outline",
+  Success: "outline",
   Failed: "destructive",
 };
 
+
 const filteredDocuments = computed(() => {
   return documents.value.filter(
-    (document) => document.status === 1 || document.status === 2
+    (document) => document.status === 0 || document.status === 1 || document.status === 2
   );
 });
 

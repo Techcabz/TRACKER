@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/table";
 import { useDocuStore } from "@/stores/document";
 import { valueUpdater } from "@/utils";
+import CustomDialog from "@/components/general/dialog/CustomDialog.vue";
 import { CaretSortIcon, ChevronDownIcon } from "@radix-icons/vue";
 import {
   FlexRender,
@@ -38,13 +39,21 @@ import {
   useVueTable,
 } from "@tanstack/vue-table";
 import { h, ref, onMounted, computed } from "vue";
+import StatusPage from "../status/StatusPage.vue";
 
 const docuStore = useDocuStore();
-const documents = ref(docuStore.documents);
+const document = ref(docuStore.document);
+const isLoading = ref(true);
 
 onMounted(async () => {
-  await docuStore.fetchDocuments();
-  documents.value = docuStore.documents;
+  try {
+    await docuStore.getDocuments();
+    document.value = docuStore.document;
+    isLoading.value = false;
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    isLoading.value = false;
+  }
 });
 
 export interface Documents {
@@ -55,27 +64,32 @@ export interface Documents {
 }
 
 const statusMap = {
-  1: "Pending",
-  0: "Success",
-  2: "Processing",
-  3: "Failed",
+  0: "Pending",
+  1: "InProgress",
+  2: "Verify",
+  3: "Success",
+  4: "Failed",
 };
 
 const statusBadgeMap = {
   Pending: "default",
-  Success: "secondary",
-  Processing: "outline",
+  InProgress: "secondary",
+  Verify: "outline",
+  Success: "outline",
   Failed: "destructive",
 };
 
 const filteredDocuments = computed(() => {
-  return documents.value.filter(
-    (document) => document.status === 0 || document.status === 3
+  return document.value.filter(
+    (document) => document.status === 3 || document.status === 4
   );
 });
 
-const data: Documents[] = [...filteredDocuments.value];
-
+const selectedDocument = computed(() =>
+  document.value.find((document) => document.id === selectedDocuId.value)
+);
+const isDialogOpen = ref(false);
+const selectedDocuId = ref<string>();
 const columns: ColumnDef<Documents>[] = [
   {
     accessorKey: "name",
@@ -127,7 +141,7 @@ const columns: ColumnDef<Documents>[] = [
         {
           variant: badgeVariant,
         },
-        () => statusString 
+        () => statusString
       );
     },
   },
@@ -135,14 +149,17 @@ const columns: ColumnDef<Documents>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const document = row.original;
+      const document = row.original.id;
       return h(
         Button,
         {
           variant: "outline",
           size: "sm",
           class: "bg-grass11 text-white",
-          onClick: () => console.log("Button clicked for document:", document),
+          onClick: () => {
+            selectedDocuId.value = document;
+            isDialogOpen.value = true;
+          },
         },
         () => "View"
       );
@@ -157,7 +174,7 @@ const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
 
 const table = useVueTable({
-  data,
+  data: filteredDocuments,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -193,7 +210,23 @@ const table = useVueTable({
 </script>
 
 <template>
-  <div class="w-full">
+  <CustomDialog
+    v-model:open="isDialogOpen"
+    title="Document Information"
+    description="Information about documents with a status"
+    closeText="Cancel"
+    saveText="Approved"
+  >
+    <template #default>
+      <div v-if="filteredDocuments">
+        <StatusPage :selectedDocument="selectedDocument" />
+      </div>
+      <div v-else>
+        <p>No user selected.</p>
+      </div>
+    </template>
+  </CustomDialog>
+  <div v-if="!isLoading" class="w-full">
     <div class="flex items-center py-4">
       <Input
         class="max-w-sm"
@@ -294,6 +327,9 @@ const table = useVueTable({
         </Button>
       </div>
     </div>
+  </div>
+  <div v-else class="flex justify-center items-center h-48">
+    <p>Loading...</p>
   </div>
 </template>
 

@@ -38,7 +38,7 @@ class DocumentsController extends Controller implements HasMiddleware
         $document = new Documents();
         $document->name = $fields['name'];
         $document->category = $fields['category'];
-        $document->status = 1;
+        $document->status = 0;
         $document->file_path = "path";
         $document->owner_id = auth()->id();
         $document->save();
@@ -55,13 +55,13 @@ class DocumentsController extends Controller implements HasMiddleware
      */
     public function show($id)
     {
-        $document = Documents::where('owner_id', $id)->first();
+        $document = Documents::where('owner_id', $id)->get();
 
         if (!$document) {
             return response()->json(['error' => 'Document not found'], 404);
         }
 
-        return response()->json([$document]);
+        return response()->json($document);
     }
     /**
      * Update the specified resource in storage.

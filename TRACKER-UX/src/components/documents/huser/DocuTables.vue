@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-
+import CustomDialog from "@/components/general/dialog/CustomDialog.vue";
 import {
   Table,
   TableBody,
@@ -38,15 +38,22 @@ import {
   useVueTable,
 } from "@tanstack/vue-table";
 import { h, ref, onMounted, computed } from "vue";
+import StatusPage from "../user/status/StatusPage.vue";
 
 const docuStore = useDocuStore();
 const documents = ref(docuStore.documents);
+const isLoading = ref(true);
 
 onMounted(async () => {
-  await docuStore.fetchDocuments();
-  documents.value = docuStore.documents;
+  try {
+    await docuStore.fetchDocuments();
+    documents.value = docuStore.documents;
+    isLoading.value = false;
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    isLoading.value = false;
+  }
 });
-console.log(documents)
 
 export interface Documents {
   id: string;
@@ -72,12 +79,18 @@ const statusBadgeMap = {
 };
 
 const filteredDocuments = computed(() => {
-  return document.value.filter(
-    (document) => document.status === 0 || document.status === 1  || document.status === 2
+  return documents.value.filter(
+    (documents) =>
+      documents.status === 0 || documents.status === 1 || documents.status === 2
   );
 });
 
-const data: Documents[] = [...filteredDocuments.value];
+const selectedDocument = computed(() =>
+  documents.value.find((document) => document.id === selectedDocuId.value)
+);
+
+const isDialogOpen = ref(false);
+const selectedDocuId = ref<string>();
 
 const columns: ColumnDef<Documents>[] = [
   {
@@ -130,11 +143,30 @@ const columns: ColumnDef<Documents>[] = [
         {
           variant: badgeVariant,
         },
-        () => statusString 
+        () => statusString
       );
     },
   },
- 
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const document = row.original.id;
+      return h(
+        Button,
+        {
+          variant: "outline",
+          size: "sm",
+          class: "bg-grass11 text-white",
+          onClick: () => {
+            selectedDocuId.value = document;
+            isDialogOpen.value = true;
+          },
+        },
+        () => "View"
+      );
+    },
+  },
 ];
 
 const sorting = ref<SortingState>([]);
@@ -144,7 +176,7 @@ const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
 
 const table = useVueTable({
-  data,
+  data: filteredDocuments,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -180,7 +212,23 @@ const table = useVueTable({
 </script>
 
 <template>
-  <div class="w-full">
+  <CustomDialog
+    v-model:open="isDialogOpen"
+    title="Document Information"
+    description="Information about documents with a status"
+    closeText="Cancel"
+    saveText="Approved"
+  >
+    <template #default>
+      <div v-if="filteredDocuments">
+        <StatusPage :selectedDocument="selectedDocument" />
+      </div>
+      <div v-else>
+        <p>No document selected.</p>
+      </div>
+    </template>
+  </CustomDialog>
+  <div v-if="!isLoading" class="w-full">
     <div class="flex items-center py-4">
       <Input
         class="max-w-sm"
@@ -281,6 +329,9 @@ const table = useVueTable({
         </Button>
       </div>
     </div>
+  </div>
+  <div v-else class="flex justify-center items-center h-48">
+    <p>Loading...</p>
   </div>
 </template>
 

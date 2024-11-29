@@ -1,6 +1,5 @@
-import axios from "axios";
 import { defineStore } from "pinia";
-import { useAuthStore } from "@/stores/auth"; // Import auth store
+import { useAuthStore } from "@/stores/auth";
 
 export const useDocuStore = defineStore("docuStore", {
   state: () => ({
@@ -29,8 +28,8 @@ export const useDocuStore = defineStore("docuStore", {
         }
 
         const data = await response.json();
-       
-        this.documents = data; // Store the fetched documents in the state
+
+        this.documents = data;
       } catch (error: any) {
         this.errors = error.message || "Failed to fetch documents.";
       } finally {
@@ -49,7 +48,6 @@ export const useDocuStore = defineStore("docuStore", {
         return;
       }
 
-     
       try {
         const userId = authStore.user?.id;
 
@@ -68,7 +66,7 @@ export const useDocuStore = defineStore("docuStore", {
         }
 
         const data = await response.json();
-       
+
         this.document = data;
       } catch (error: any) {
         this.errors = error.message || "Failed to fetch documents.";

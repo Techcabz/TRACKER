@@ -43,11 +43,7 @@ import StatusPage from "../status/StatusPage.vue";
 
 const docuStore = useDocuStore();
 const document = ref(docuStore.document);
-
-onMounted(async () => {
-  await docuStore.getDocuments();
-  document.value = docuStore.document;
-});
+const isLoading = ref(true);
 
 export interface Documents {
   id: string;
@@ -57,30 +53,44 @@ export interface Documents {
 }
 
 const statusMap = {
-  1: "Pending",
-  0: "Success",
-  4: "InProgress",
-  2: "Processing",
-  3: "Failed",
+  0: "Pending",
+  1: "InProgress",
+  2: "Verify",
+  3: "Success",
+  4: "Failed",
 };
 
 const statusBadgeMap = {
   Pending: "default",
-  Success: "secondary",
-  InProgress: "outline",
-  Processing: "outline",
+  InProgress: "secondary",
+  Verify: "outline",
+  Success: "outline",
   Failed: "destructive",
 };
 
+onMounted(async () => {
+  try {
+    await docuStore.getDocuments();
+    document.value = docuStore.document;
+    isLoading.value = false;
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    isLoading.value = false;
+  }
+});
+
 const filteredDocuments = computed(() => {
   return document.value.filter(
-    (document) => document.status === 1 || document.status === 2
+    (document) => document.status === 0 || document.status === 1
   );
 });
 
+const selectedDocument = computed(() =>
+  document.value.find((document) => document.id === selectedDocuId.value)
+);
+
 const isDialogOpen = ref(false);
 const selectedDocuId = ref<string>();
-const data: Documents[] = [...filteredDocuments.value];
 
 const columns: ColumnDef<Documents>[] = [
   {
@@ -166,7 +176,7 @@ const rowSelection = ref({});
 const expanded = ref<ExpandedState>({});
 
 const table = useVueTable({
-  data,
+  data: filteredDocuments,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -211,7 +221,7 @@ const table = useVueTable({
   >
     <template #default>
       <div v-if="filteredDocuments">
-        <StatusPage />
+        <StatusPage :selectedDocument="selectedDocument" />
       </div>
       <div v-else>
         <p>No user selected.</p>
@@ -219,7 +229,7 @@ const table = useVueTable({
     </template>
   </CustomDialog>
 
-  <div class="w-full">
+  <div v-if="!isLoading" class="w-full">
     <div class="flex items-center py-4">
       <Input
         class="max-w-sm"
@@ -320,6 +330,9 @@ const table = useVueTable({
         </Button>
       </div>
     </div>
+  </div>
+  <div v-else class="flex justify-center items-center h-48">
+    <p>Loading...</p>
   </div>
 </template>
 
