@@ -158,6 +158,7 @@ export const useUserStore = defineStore("userStore", {
 
         if (res.ok) {
           const data = await res.json();
+          console.log(data)
           return { success: true, data };
         } else {
           const data = await res.json();

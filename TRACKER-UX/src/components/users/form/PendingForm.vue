@@ -12,7 +12,7 @@ import {
 import { useUserStore } from "@/stores/user";
 import { useToast } from "@/components/ui/toast/use-toast";
 
-import { defineProps } from "vue";
+import { defineProps, defineEmits } from "vue";
 const userStore = useUserStore();
 const { toast } = useToast();
 
@@ -26,6 +26,13 @@ const props = defineProps<{
     position: string;
   };
 }>();
+
+const emit = defineEmits(["update:isDialogOpen", "refresh-users"]);
+
+const closeDialog = () => {
+  emit("update:isDialogOpen", false);
+  console.log("close");
+};
 
 const deleteUser = async () => {
   if (props.selectedUser && props.selectedUser.id) {
@@ -55,6 +62,7 @@ const deleteUser = async () => {
 const approveUser = async () => {
   if (props.selectedUser && props.selectedUser.id) {
     try {
+      // emit("refresh-users");
       const res = await userStore.changeStatus(
         Number(props.selectedUser.id),
         1
@@ -65,8 +73,10 @@ const approveUser = async () => {
           description: "User approved successfully.",
           class: "bg-green-500 text-white",
         });
-     
-       
+
+        emit("refresh-users");
+
+        closeDialog();
       } else {
         toast({
           description: "User approval failed. Please check the errors.",

@@ -42,6 +42,7 @@ import { Badge } from "@/components/ui/badge";
 import CustomDialog from "@/components/general/dialog/CustomDialog.vue";
 import PendingForm from "./form/PendingForm.vue";
 const userStore = useUserStore();
+const isLoading = ref(true);
 const users = ref(userStore.users);
 
 // Define the Users interface
@@ -69,18 +70,16 @@ onMounted(async () => {
   try {
     await userStore.getUserList();
     users.value = userStore.users;
+    isLoading.value = false;
   } catch (error) {
     console.error("Failed to fetch users:", error);
+    isLoading.value = false;
   }
 });
 
 const filteredUsers = computed(() => {
-  return users.value.filter(
-    (users) => users.role_as === 0 && users.status === 0
-  );
+  return users.value.filter((user) => user.role_as === 0 && user.status === 0);
 });
-
-const data: Users[] = [...filteredUsers.value];
 
 const selectedUser = computed(() =>
   users.value.find((user) => user.id === selectedUserId.value)
@@ -190,7 +189,7 @@ const expanded = ref<ExpandedState>({});
 
 // Setup table
 const table = useVueTable({
-  data,
+  data: filteredUsers,
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -218,6 +217,18 @@ const table = useVueTable({
     },
   },
 });
+
+// Refresh users function for dialog updates
+const refreshUsers = async () => {
+  isLoading.value = true;
+  try {
+    await userStore.getUserList();
+    users.value = userStore.users;
+    isLoading.value = false;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+  }
+};
 </script>
 
 <template>
@@ -230,15 +241,19 @@ const table = useVueTable({
   >
     <template #default>
       <div v-if="selectedUser">
-        <PendingForm :users="users" :selectedUser="selectedUser" />
+        <PendingForm
+          @refresh-users="refreshUsers"
+          @update:isDialogOpen="(value) => (isDialogOpen = value)"
+          :selectedUser="selectedUser"
+        />
       </div>
       <div v-else>
         <p>No user selected.</p>
       </div>
     </template>
   </CustomDialog>
-
-  <div class="w-full">
+  
+  <div v-if="!isLoading" class="w-full">
     <div class="flex items-center py-4">
       <Input
         class="max-w-sm"
@@ -340,5 +355,9 @@ const table = useVueTable({
         </Button>
       </div>
     </div>
+  </div>
+
+  <div v-else class="flex justify-center items-center h-48">
+    <p>Loading...</p>
   </div>
 </template>

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/stepper";
 
 import { FilePlus, ClipboardCheck, FileCheck, CheckCircle } from "lucide-vue-next";
+import { ref } from "vue";
 
 const steps = [
   {
@@ -37,6 +38,8 @@ const steps = [
     icon: CheckCircle,
   },
 ];
+
+const currentStep = ref(2);
 </script>
 
 <template>
@@ -47,7 +50,7 @@ const steps = [
       class="basis-1/4"
       :step="item.step"
     >
-      <StepperTrigger>
+      <StepperTrigger  :class="{ 'pointer-events-none opacity-100': item.step !== currentStep }">
         <StepperIndicator>
           <component :is="item.icon" class="w-4 h-4" />
         </StepperIndicator>

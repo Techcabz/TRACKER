@@ -40,9 +40,10 @@ import { h, ref, onMounted, computed } from "vue";
 import { useUserStore } from "@/stores/user";
 import { Badge } from "@/components/ui/badge";
 import CustomDialog from "@/components/general/dialog/CustomDialog.vue";
-import { User } from "lucide-vue-next";
+
 import DetailsForm from "./form/DetailsForm.vue";
 
+const isLoading = ref(true);
 const userStore = useUserStore();
 const users = ref(userStore.users);
 
@@ -71,19 +72,18 @@ onMounted(async () => {
   try {
     await userStore.getUserList();
     users.value = userStore.users;
+    isLoading.value = false;
   } catch (error) {
     console.error("Failed to fetch users:", error);
+    isLoading.value = false;
   }
 });
 
 const filteredUsers = computed(() => {
-  return users.value.filter(
-    (users) => users.role_as === 0 && users.status === 1
-  );
+  return users.value.filter((user) => user.role_as === 0 && user.status === 1);
 });
 
-const data: Users[] = [...filteredUsers.value];
-
+// Instead of defining `data` as a static array, we bind it to the computed `filteredUsers`
 const selectedUser = computed(() =>
   users.value.find((user) => user.id === selectedUserId.value)
 );
@@ -175,7 +175,7 @@ const columns: ColumnDef<Users>[] = [
           class: "bg-grass11 text-white",
           onClick: () => {
             selectedUserId.value = userData;
-            isDialogOpen.value = true; 
+            isDialogOpen.value = true;
           },
         },
         () => "View"
@@ -192,7 +192,7 @@ const expanded = ref<ExpandedState>({});
 
 // Setup table
 const table = useVueTable({
-  data,
+  data: filteredUsers, // Bind directly to the filteredUsers computed property
   columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -240,7 +240,7 @@ const table = useVueTable({
     </template>
   </CustomDialog>
 
-  <div class="w-full">
+  <div v-if="!isLoading" class="w-full">
     <div class="flex items-center py-4">
       <Input
         class="max-w-sm"
@@ -342,6 +342,9 @@ const table = useVueTable({
         </Button>
       </div>
     </div>
+  </div>
+  <div v-else class="flex justify-center items-center h-48">
+    <p>Loading...</p>
   </div>
 </template>
 <style lang="css" scoped>
