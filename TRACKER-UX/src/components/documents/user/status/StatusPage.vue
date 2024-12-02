@@ -114,15 +114,12 @@ onMounted(async () => {
   authStore.getUser();
   try {
     const data = await docuStore.getRemarks(props.selectedDocument.id);
-   
+
     if (data && data.remark) {
       remarks.value = data?.remark || "";
-      
     } else {
       remarks.value = "";
     }
-    
-    console.log(remarks.value.trim() !== '');
   } catch (error) {
     console.error("Error fetching remarks:", error);
   }
