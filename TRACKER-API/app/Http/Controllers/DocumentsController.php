@@ -48,7 +48,13 @@ class DocumentsController extends Controller implements HasMiddleware
         }
 
         $file = $request->file('file');
-        $filePath = $file->store('documents', 'public');
+        $extension = $file->getClientOriginalExtension();
+        $timestamp = time();
+        $newFileName = $fields['name'] . '_' . $timestamp . '.' . $extension;
+
+
+        $filePath = $file->storeAs('documents', $newFileName, 'public');
+
 
         $document = new Documents();
         $document->name = $fields['name'];
