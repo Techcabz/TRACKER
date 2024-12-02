@@ -36,7 +36,42 @@ export const useDocuStore = defineStore("docuStore", {
         this.isLoading = false;
       }
     },
-
+    async getRemarks(id) {
+      const authStore = useAuthStore();
+      const token = localStorage.getItem("token");
+      this.isLoading = true;
+      this.errors = null;
+    
+      if (!token) {
+        this.errors = "No token found.";
+        return;
+      }
+    
+      try {
+        const userId = authStore.user?.id;
+    
+        if (!userId) {
+          this.errors = "User ID not found.";
+          return;
+        }
+        const response = await fetch(`/api/dissaproved/${id}/remarks`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+    
+        if (!response.ok) {
+          throw new Error("Failed to fetch documents.");
+        }
+    
+        const data = await response.json();
+        return data; 
+      } catch (error) {
+        this.errors = error.message || "Failed to fetch documents.";
+      } finally {
+        this.isLoading = false;
+      }
+    },
     async getDocuments() {
       const authStore = useAuthStore();
       const token = localStorage.getItem("token");

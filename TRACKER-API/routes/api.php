@@ -15,6 +15,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::apiResource('documents', DocumentsController::class);
 Route::apiResource('dissaproved', DocumentDisapprovalController::class);
+Route::get('/dissaproved/{id}/remarks', [DocumentDisapprovalController::class,'showByDocumentId']);
 Route::apiResource('personal', PersonalDetailController::class)->middleware('auth:sanctum');
 
 Route::get('/users', [UserController::class, 'GetUser']);

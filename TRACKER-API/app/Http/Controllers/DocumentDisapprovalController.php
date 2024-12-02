@@ -27,17 +27,17 @@ class DocumentDisapprovalController extends Controller
             'remark' => 'required|string|max:255',
         ]);
 
-         $document = Documents::findOrFail($request->document_id);
-         $disapproval = DocumentDisapproval::create([
-             'document_id' => $document->id,
-             'remark' => $request->remark,
-         ]);
+        $document = Documents::findOrFail($request->document_id);
+        $disapproval = DocumentDisapproval::create([
+            'document_id' => $document->id,
+            'remark' => $request->remark,
+        ]);
 
-         return response()->json([
-             'success' => true,
-             'data' => $disapproval,
-             'message' => 'Document disapproved successfully.'
-         ]);
+        return response()->json([
+            'success' => true,
+            'data' => $disapproval,
+            'message' => 'Document disapproved successfully.'
+        ]);
     }
 
     /**
@@ -62,5 +62,10 @@ class DocumentDisapprovalController extends Controller
     public function destroy(DocumentDisapproval $documentDisapproval)
     {
         //
+    }
+
+    public function showByDocumentId($documentId)
+    {
+        return DocumentDisapproval::where('document_id', $documentId)->first();
     }
 }
