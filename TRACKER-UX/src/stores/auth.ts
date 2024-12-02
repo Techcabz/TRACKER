@@ -191,7 +191,7 @@ export const useAuthStore = defineStore("authStore", {
           this.router.push({ name: "dashboard" });
         }
 
-        // Don't redirect here. Instead, rely on the navigation guard
+       
         return { success: true }; // Return success flag
       }
     },

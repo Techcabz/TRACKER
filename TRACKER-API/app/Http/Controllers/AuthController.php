@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\PersonalDetail;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -20,6 +21,22 @@ class AuthController extends Controller
             'position' => 'required|max:255',
             'password' => 'required|confirmed',
         ]);
+
+        if (in_array(strtolower($fields['position']), ['chairman', 'dean'])) {
+            $existingPersonalDetail = DB::table('personal_details as pd')
+                ->join('users as u', 'u.id', '=', 'pd.users_id')
+                ->whereIn('pd.position', ['chairman', 'dean'])
+                ->whereRaw('LOWER(pd.position) = ?', [strtolower($fields['position'])])
+                ->where('u.status', 1)
+                ->first();
+
+            if ($existingPersonalDetail) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => ['There is already a user with this position and status 1']
+                ], 400);
+            }
+        }
 
         // Create the user record
         $user = User::create([
@@ -40,10 +57,11 @@ class AuthController extends Controller
 
 
         $token = $user->createToken($request->username)->plainTextToken;
-        return [
+        return response()->json([
+            'success' => true,
             'user' => $user,
             'token' => $token
-        ];
+        ]);
     }
 
 

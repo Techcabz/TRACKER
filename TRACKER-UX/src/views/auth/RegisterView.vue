@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast/use-toast";
 import {
@@ -24,8 +24,12 @@ import {
 const { errors } = storeToRefs(useAuthStore());
 const authStore = useAuthStore();
 const { toast } = useToast();
+const isSubmitting = ref(false);
 
 const register = async () => {
+  if (isSubmitting.value) return;
+  isSubmitting.value = true;
+
   try {
     const res = await authStore.register(formData);
 
@@ -34,6 +38,8 @@ const register = async () => {
         description: "Registration successful. Please wait for admin approval.",
         class: "bg-green-500 text-white",
       });
+
+      // Reset form fields
       formData.username = "";
       formData.email = "";
       formData.fname = "";
@@ -43,12 +49,35 @@ const register = async () => {
       formData.password_confirmation = "";
     } else {
       toast({
-        description: "Registration failed. Please check the errors.",
+        description: Object.values(res.errors).flat().join(", "),
         class: "bg-red-500 text-white",
       });
     }
   } catch (error) {
-    console.error("Registration failed:", error);
+    if (error.response && error.response.data.errors) {
+      const errors = error.response.data.errors;
+
+      if (errors.login) {
+        toast({
+          description: errors.login[0],
+          class: "bg-red-500 text-white",
+        });
+      } else {
+        toast({
+          description: "Registration failed. Please check your inputs.",
+          class: "bg-red-500 text-white",
+        });
+      }
+    } else {
+      toast({
+        description: "An unexpected error occurred. Please try again later.",
+        class: "bg-red-500 text-white",
+      });
+    }
+
+    console.error("Registration error:", error);
+  } finally {
+    isSubmitting.value = false;
   }
 };
 
@@ -93,7 +122,9 @@ const formData = reactive<FormData>({
               v-model="formData.username"
               required
             />
-            <p v-if="errors.username" class="errors">{{ errors.username[0] }}</p>
+            <p v-if="errors.username" class="errors">
+              {{ errors.username[0] }}
+            </p>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
@@ -141,12 +172,16 @@ const formData = reactive<FormData>({
                 <SelectItem value="dean">Dean</SelectItem>
               </SelectContent>
             </Select>
-            <p v-if="errors.position" class="errors">{{ errors.position[0] }}</p>
+            <p v-if="errors.position" class="errors">
+              {{ errors.position[0] }}
+            </p>
           </div>
           <div class="grid gap-2">
             <Label for="password">Password</Label>
             <Input id="password" type="password" v-model="formData.password" />
-            <p v-if="errors.password" class="errors">{{ errors.password[0] }}</p>
+            <p v-if="errors.password" class="errors">
+              {{ errors.password[0] }}
+            </p>
           </div>
           <div class="grid gap-2">
             <Label for="password">Confirm Password</Label>
@@ -157,9 +192,13 @@ const formData = reactive<FormData>({
           </div>
           <Button
             type="submit"
-            class="w-full bg-grass11 gap-1 text-white rounded hover:bg-grass11 focus:ring-2 focus:ring-grass11 focus:ring-offset-2 focus:outline-none"
+            :disabled="isSubmitting"
+            class="w-full bg-grass11 text-white rounded hover:bg-grass11 focus:ring-2 focus:ring-grass11 focus:ring-offset-2 focus:outline-none flex items-center justify-center"
           >
-            Create an account
+            <span v-if="!isSubmitting">Create an account</span>
+            <span v-else class="loading-spinner mr-2"></span>
+            <!-- Loading Spinner -->
+            <span v-if="isSubmitting">Submitting...</span>
           </Button>
         </div>
       </form>
@@ -172,3 +211,22 @@ const formData = reactive<FormData>({
     </CardContent>
   </Card>
 </template>
+<style lang="css" scoped>
+.loading-spinner {
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
