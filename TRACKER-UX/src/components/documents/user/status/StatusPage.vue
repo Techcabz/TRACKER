@@ -330,6 +330,54 @@ const approveAsDean = async () => {
       </Button>
     </div>
   </div>
+
+  <div v-else class="mt-12">
+    <Separator class="my-4" label="Documents Information" />
+    <Card>
+      <CardContent>
+        <div class="flex mt-3 items-center w-full p-3 gap-4">
+          <!-- Left Content Section -->
+          <div class="flex flex-col gap-2 w-full">
+            <div class="flex flex-col">
+              <Label for="name" class="mb-2">Name</Label>
+              <Input readonly v-model="selectedDocument.name" />
+            </div>
+            <div class="flex flex-col">
+              <Label for="category" class="mb-2">Category</Label>
+              <Input readonly v-model="selectedDocument.category" />
+            </div>
+          </div>
+
+          <!-- Right Content Section -->
+          <div class="flex flex-col gap-2 w-full">
+            <div class="flex flex-col">
+              <Label for="category" class="mb-2">View document here:</Label>
+              <Button
+                variant="outline"
+                @click="viewDocument"
+                class="bg-grass11 text-white hover:bg-green-700 hover:text-white focus:ring-4 focus:ring-green-300 rounded-md py-2 px-4 flex items-center"
+              >
+                <svg
+                  class="w-5 h-5 mr-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M9 3a1 1 0 011 1v7.586l3.707-3.707a1 1 0 111.414 1.414l-5 5a1 1 0 01-1.414 0l-5-5a1 1 0 111.414-1.414L8 11.586V4a1 1 0 011-1z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Download Document
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
 </template>
 <style lang="css" scoped>
 .custom-m {
