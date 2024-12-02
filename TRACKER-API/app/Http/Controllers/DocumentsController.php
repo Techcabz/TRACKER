@@ -34,8 +34,6 @@ class DocumentsController extends Controller implements HasMiddleware
             'file' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
         ]);
 
-
-
         $existingDocument = Documents::where('name', $fields['name'])
             ->where('category', $fields['category'])
             ->first();

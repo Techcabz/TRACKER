@@ -158,7 +158,7 @@ export const useDocuStore = defineStore("docuStore", {
         });
 
         if (res.ok) {
-          const fileContent = await res.blob(); 
+          const fileContent = await res.blob();
           return { success: true, fileContent };
         } else {
           const data = await res.json();
@@ -166,6 +166,41 @@ export const useDocuStore = defineStore("docuStore", {
         }
       } catch (error) {
         console.error("Error while fetching document file content", error);
+        return { success: false, errors: error.message };
+      }
+    },
+
+    async submitDisapproval(
+      docuId: number,
+      remark: string
+    ): Promise<{ success: boolean; data?: any; errors?: any }> {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.error("No token found");
+        return { success: false, errors: "No token found" };
+      }
+
+      try {
+        const res = await fetch(`/api/dissaproved`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ document_id: docuId, remark }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log(data);
+          return { success: true, data };
+        } else {
+          const data = await res.json();
+          return { success: false, errors: data.errors };
+        }
+      } catch (error) {
+        console.error("Error while submitting disapproval", error);
         return { success: false, errors: error.message };
       }
     },

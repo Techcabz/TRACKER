@@ -22,9 +22,4 @@ class Documents extends Model
     {
         return $this->belongsTo(User::class, 'owner_id', 'id');
     }
-
-    public function approvals()
-    {
-        return $this->hasMany(DocumentApproval::class);
-    }
 }

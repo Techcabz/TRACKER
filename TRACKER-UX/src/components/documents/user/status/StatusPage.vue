@@ -7,6 +7,13 @@ import {
   StepperSeparator,
   StepperTitle,
   StepperTrigger,
+  DialogClose,
+  DialogContent,
+  DialogOverlay,
+  DialogPortal,
+  DialogRoot,
+  DialogTitle,
+  DialogTrigger,
 } from "radix-vue";
 
 import {
@@ -14,6 +21,7 @@ import {
   ClipboardCheck,
   FileCheck,
   CheckCircle,
+  Undo2,
 } from "lucide-vue-next";
 import { ref, onMounted, computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
@@ -32,12 +40,11 @@ import Label from "@/components/ui/label/Label.vue";
 import { Button } from "@/components/ui/button";
 import { useDocuStore } from "@/stores/document";
 import { useToast } from "@/components/ui/toast/use-toast";
-
+import { Textarea } from "@/components/ui/textarea";
 const emit = defineEmits(["update:isDialogOpen", "refresh-docu"]);
 
 const closeDialog = () => {
   emit("update:isDialogOpen", false);
-  console.log("close");
 };
 
 const isAdmin = computed(() => {
@@ -45,7 +52,7 @@ const isAdmin = computed(() => {
     return authStore.user?.role == "1";
   }
 });
-
+const remark = ref("");
 const { toast } = useToast();
 const isNoTHighUser = computed(() => {
   if (authStore.user) {
@@ -58,10 +65,7 @@ const isNoTHighUser = computed(() => {
 
 const isFacultyhUser = computed(() => {
   if (authStore.user) {
-    return (
-      authStore.user?.personalDetails?.position === "faculty"
-     
-    );
+    return authStore.user?.personalDetails?.position === "faculty";
   }
 });
 
@@ -89,6 +93,12 @@ const steps = [
     title: "Done",
     description: "The document submission process is complete.",
     icon: CheckCircle,
+  },
+  {
+    step: 4,
+    title: "Disapproved",
+    description: "You can now read the remarks for further clarification.",
+    icon: Undo2,
   },
 ];
 
@@ -131,6 +141,42 @@ const canApproveAsDean = computed(() => {
     Number(props.selectedDocument.status) === 1
   );
 });
+
+const disapprovedAsChairman = async () => {
+  try {
+    const data = {
+      document_id: Number(props.selectedDocument.id),
+      remark: remark.value,
+    };
+
+    const response = await docuStore.submitDisapproval(
+      data.document_id,
+      data.remark
+    );
+
+    await docuStore.changeStatus(Number(props.selectedDocument.id), 4);
+
+    if (response.success) {
+      toast({
+        description: "Remarks submitted successfully.",
+        class: "bg-green-500 text-white",
+      });
+      emit("refresh-docu");
+      closeDialog();
+    } else {
+      toast({
+        description: "Document disapproval failed. Please check the errors.",
+        class: "bg-red-500 text-white",
+      });
+    }
+  } catch (error) {
+    console.error("Error during disapproval:", error);
+    toast({
+      description: "Something went wrong while disapproving the document.",
+      class: "bg-red-500 text-white",
+    });
+  }
+};
 
 const approveAsChairman = async () => {
   try {
@@ -274,7 +320,6 @@ const approveAsDean = async () => {
     </Card>
   </div>
 
-  
   <div v-if="isNoTHighUser" class="custom-m">
     <Separator class="my-4" label="Documents Information" />
     <Card>
@@ -321,7 +366,45 @@ const approveAsDean = async () => {
         </div>
       </CardContent>
     </Card>
-    <div v-if="canApproveAsChairman" class="flex justify-end my-2">
+    <div v-if="canApproveAsChairman" class="flex justify-end my-2 gap-3">
+      <DialogRoot>
+        <DialogTrigger
+          class="bg-red9 font-semibold shadow-blackA7 hover:bg-red11 inline-flex h-[35px] items-center justify-center rounded-[4px] text-white px-[15px] leading-none shadow-[0_2px_10px] focus:shadow-[0_0_0_2px] focus:shadow-black focus:outline-none"
+        >
+          Disapproved
+        </DialogTrigger>
+        <DialogPortal>
+          <DialogOverlay
+            class="bg-blackA9 data-[state=open]:animate-overlayShow fixed inset-0 z-30"
+          />
+          <DialogContent
+            class="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none z-[100]"
+          >
+            <DialogTitle class="text-mauve12 m-0 text-[17px] font-semibold">
+              Remarks
+            </DialogTitle>
+            <div class="flex flex-col my-5">
+              <Textarea v-model="remark" placeholder="Enter remarks here..." />
+            </div>
+
+            <div class="flex justify-end gap-5">
+              <DialogClose as-child>
+                <button
+                  class="bg-red4 text-red11 hover:bg-red5 focus:shadow-red7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none focus:shadow-[0_0_0_2px] focus:outline-none"
+                >
+                  Close
+                </button>
+              </DialogClose>
+              <Button
+                class="relative uppercase bg-grass11 text-white rounded hover:bg-grass11 focus:ring-2 focus:ring-grass11 focus:ring-offset-2 focus:outline-none"
+                @click="disapprovedAsChairman"
+              >
+                Submit
+              </Button>
+            </div>
+          </DialogContent>
+        </DialogPortal>
+      </DialogRoot>
       <Button
         class="relative uppercase bg-grass11 text-white rounded hover:bg-grass11 focus:ring-2 focus:ring-grass11 focus:ring-offset-2 focus:outline-none"
         @click="approveAsChairman"
@@ -340,8 +423,6 @@ const approveAsDean = async () => {
       </Button>
     </div>
   </div>
-
-  
 </template>
 <style lang="css" scoped>
 .custom-m {

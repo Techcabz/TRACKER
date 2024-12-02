@@ -1,10 +1,9 @@
 <?php
 
 use Illuminate\Http\Request;
-use App\Models\DocumentApproval;
-use App\Http\Controllers\FileUpload3;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DocumentDisapprovalController;
 use App\Http\Controllers\UserController;
 
 use App\Http\Controllers\DocumentsController;
@@ -15,10 +14,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::apiResource('documents', DocumentsController::class);
-Route::apiResource('documents_approval', DocumentApproval::class);
+Route::apiResource('dissaproved', DocumentDisapprovalController::class);
 Route::apiResource('personal', PersonalDetailController::class)->middleware('auth:sanctum');
-
-Route::post('/upload', [FileUpload3::class, 'upload']);
 
 Route::get('/users', [UserController::class, 'GetUser']);
 Route::get('/users_auth', [UserController::class, 'GetLogginUser']);
