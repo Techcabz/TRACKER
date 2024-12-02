@@ -56,6 +56,15 @@ const isNoTHighUser = computed(() => {
   }
 });
 
+const isFacultyhUser = computed(() => {
+  if (authStore.user) {
+    return (
+      authStore.user?.personalDetails?.position === "faculty"
+     
+    );
+  }
+});
+
 const steps = [
   {
     step: 0,
@@ -217,7 +226,7 @@ const approveAsDean = async () => {
     </StepperItem>
   </StepperRoot>
 
-  <div v-if="isAdmin" class="mt-12">
+  <div v-if="isAdmin || isFacultyhUser" class="mt-12">
     <Separator class="my-4" label="Documents Information" />
     <Card>
       <CardContent>
