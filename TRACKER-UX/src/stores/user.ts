@@ -143,7 +143,7 @@ export const useUserStore = defineStore("userStore", {
 
       if (!token) {
         console.error("No token found");
-        return { success: false, errors: "No token found" }; // Returning error object instead of just false
+        return { success: false, errors: "No token found" };
       }
 
       try {

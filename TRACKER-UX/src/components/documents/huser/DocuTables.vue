@@ -209,6 +209,17 @@ const table = useVueTable({
     },
   },
 });
+
+const refreshDocu = async () => {
+  isLoading.value = true;
+  try {
+    await docuStore.fetchDocuments();
+    documents.value = docuStore.documents;
+    isLoading.value = false;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+  }
+};
 </script>
 
 <template>
@@ -221,7 +232,11 @@ const table = useVueTable({
   >
     <template #default>
       <div v-if="filteredDocuments">
-        <StatusPage :selectedDocument="selectedDocument" />
+        <StatusPage
+          @refresh-docu="refreshDocu"
+          @update:isDialogOpen="(value) => (isDialogOpen = value)"
+          :selectedDocument="selectedDocument"
+        />
       </div>
       <div v-else>
         <p>No document selected.</p>

@@ -74,9 +74,43 @@ export const useDocuStore = defineStore("docuStore", {
         this.isLoading = false;
       }
     },
+    async changeStatus(
+      docuId: number,
+      status: number
+    ): Promise<{ success: boolean; data?: any; errors?: any }> {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.error("No token found");
+        return { success: false, errors: "No token found" };
+      }
+
+      try {
+        const res = await fetch(`/api/documents/${docuId}/approve`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log(data);
+          return { success: true, data };
+        } else {
+          const data = await res.json();
+          return { success: false, errors: data.errors };
+        }
+      } catch (error) {
+        console.error("Error while updating document status", error);
+        return { success: false, errors: error.message };
+      }
+    },
 
     // Upload a document to the server
-    async uploadDocument(formData) {
+    async uploadDocument(formData: FormData) {
       const token = localStorage.getItem("token");
       this.isLoading = true;
       this.errors = null;
@@ -85,9 +119,9 @@ export const useDocuStore = defineStore("docuStore", {
         const response = await fetch("/api/documents", {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`, // Bearer token for authentication
           },
-          body: JSON.stringify(formData), 
+          body: formData, // FormData as the request body
         });
 
         if (!response.ok) {
@@ -96,7 +130,7 @@ export const useDocuStore = defineStore("docuStore", {
         }
 
         const data = await response.json();
-        this.documents.push(data);
+        this.documents.push(data); // Update the documents array in the store
         return data;
       } catch (error) {
         this.errors = error.message || "Failed to upload document.";

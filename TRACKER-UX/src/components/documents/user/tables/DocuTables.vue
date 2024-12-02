@@ -38,7 +38,7 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import { h, ref, onMounted, computed, defineProps, toRef, PropType } from "vue";
+import { h, ref, onMounted, computed, toRef, PropType } from "vue";
 import StatusPage from "../status/StatusPage.vue";
 import DocuDialog1 from "../dialog/DocuDialog1.vue";
 import DocuUpload from "../form/DocuUpload.vue";

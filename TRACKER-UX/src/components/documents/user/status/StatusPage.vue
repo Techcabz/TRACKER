@@ -19,6 +19,7 @@ import { ref, onMounted, computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
+const docuStore = useDocuStore();
 onMounted(() => {
   authStore.getUser();
 });
@@ -29,6 +30,17 @@ import { defineProps } from "vue";
 import { Input } from "@/components/ui/input";
 import Label from "@/components/ui/label/Label.vue";
 import { Button } from "@/components/ui/button";
+import { useDocuStore } from "@/stores/document";
+import { useToast } from "@/components/ui/toast/use-toast";
+
+const emit = defineEmits(["update:isDialogOpen", "refresh-docu"]);
+
+const closeDialog = () => {
+  emit("update:isDialogOpen", false);
+  console.log("close");
+};
+
+const { toast } = useToast();
 const isNoTHighUser = computed(() => {
   if (authStore.user) {
     return (
@@ -70,11 +82,12 @@ const props = defineProps<{
     id: string;
     name: string;
     category: string;
-    path: string;
+    file_path: string;
     status: string;
   };
 }>();
 
+console.log(props.selectedDocument.file_path)
 const currentStep = ref(Number(props.selectedDocument.status));
 
 const canApproveAsChairman = computed(() => {
@@ -91,12 +104,61 @@ const canApproveAsDean = computed(() => {
   );
 });
 
-const approveAsChairman = () => {
-  props.selectedDocument.status = "1";
+const approveAsChairman = async () => {
+ 
+  try {
+    const res = await docuStore.changeStatus(
+      Number(props.selectedDocument.id),
+      1
+    );
+    if (res.success) {
+      toast({
+        description: "Document approved successfully.",
+        class: "bg-green-500 text-white",
+      });
+      emit("refresh-docu");
+      closeDialog();
+    } else {
+      toast({
+        description: "Document approval failed. Please check the errors.",
+        class: "bg-red-500 text-white",
+      });
+    }
+  } catch (error) {
+    console.error("Error during approval:", error);
+    toast({
+      description: "Something went wrong while approving the document.",
+      class: "bg-red-500 text-white",
+    });
+  }
 };
 
-const approveAsDean = () => {
-  props.selectedDocument.status = "2";
+const approveAsDean = async () => {
+  try {
+    const res = await docuStore.changeStatus(
+      Number(props.selectedDocument.id),
+      3
+    );
+    if (res.success) {
+      toast({
+        description: "Document approved successfully.",
+        class: "bg-green-500 text-white",
+      });
+      emit("refresh-docu");
+      closeDialog();
+    } else {
+      toast({
+        description: "Document approval failed. Please check the errors.",
+        class: "bg-red-500 text-white",
+      });
+    }
+  } catch (error) {
+    console.error("Error during approval:", error);
+    toast({
+      description: "Something went wrong while approving the document.",
+      class: "bg-red-500 text-white",
+    });
+  }
 };
 </script>
 
@@ -155,7 +217,16 @@ const approveAsDean = () => {
           </div>
 
           <!-- Right Content Section -->
-          <div class="flex flex-col gap-2 w-full"></div>
+          <div class="flex flex-col gap-2 w-full">
+            <div class="flex flex-col">
+              <Label for="category" class="mb-2"
+                >View your document here:</Label
+              >
+              <Button variant="outline"
+                >View Document {{ selectedDocument.file_path }}</Button
+              >
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
