@@ -28,10 +28,6 @@ class DocumentsController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
-
-        // return response()->json([
-        //     'request_data' => $request->all(),
-        // ], 200);
         $fields = $request->validate([
             'name' => 'required|max:255',
             'category' => 'required|max:255',
