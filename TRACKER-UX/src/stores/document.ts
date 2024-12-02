@@ -109,7 +109,6 @@ export const useDocuStore = defineStore("docuStore", {
       }
     },
 
-    // Upload a document to the server
     async uploadDocument(formData: FormData) {
       const token = localStorage.getItem("token");
       this.isLoading = true;
@@ -137,6 +136,37 @@ export const useDocuStore = defineStore("docuStore", {
         throw error;
       } finally {
         this.isLoading = false;
+      }
+    },
+    async fetchFileContent(
+      docuId: number
+    ): Promise<{ success: boolean; fileContent?: Blob; errors?: any }> {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.error("No token found");
+        return { success: false, errors: "No token found" };
+      }
+
+      try {
+        const res = await fetch(`/api/documents/${docuId}/file`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.ok) {
+          const fileContent = await res.blob(); 
+          return { success: true, fileContent };
+        } else {
+          const data = await res.json();
+          return { success: false, errors: data.errors };
+        }
+      } catch (error) {
+        console.error("Error while fetching document file content", error);
+        return { success: false, errors: error.message };
       }
     },
     removeDocument(documentId: number) {

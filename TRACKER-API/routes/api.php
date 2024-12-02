@@ -23,8 +23,12 @@ Route::post('/upload', [FileUpload3::class, 'upload']);
 Route::get('/users', [UserController::class, 'GetUser']);
 Route::get('/users_auth', [UserController::class, 'GetLogginUser']);
 Route::put('/users/{userId}/approve', [UserController::class, 'changeUserStatus']);
-Route::put('/documents/{id}/approve', [DocumentsController::class, 'changeStatus']);
 Route::delete('/users/{userId}', [UserController::class, 'deleteUser']);
+
+Route::put('/documents/{id}/approve', [DocumentsController::class, 'changeStatus']);
+Route::get('/documents/{id}/file', [DocumentsController::class, 'getFile']);
+
+
 
 
 

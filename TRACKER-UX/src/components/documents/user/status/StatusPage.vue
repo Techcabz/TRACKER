@@ -87,8 +87,21 @@ const props = defineProps<{
   };
 }>();
 
-console.log(props.selectedDocument.file_path)
 const currentStep = ref(Number(props.selectedDocument.status));
+
+const viewDocument = async () => {
+  if (props.selectedDocument.file_path) {
+    const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+    const publicFileUrl = `${apiUrl}/storage/${props.selectedDocument.file_path}`;
+  
+    window.open(publicFileUrl, "_blank");
+  } else {
+    toast({
+      description: "Document not available.",
+      class: "bg-red-500 text-white",
+    });
+  }
+};
 
 const canApproveAsChairman = computed(() => {
   return (
@@ -105,7 +118,6 @@ const canApproveAsDean = computed(() => {
 });
 
 const approveAsChairman = async () => {
- 
   try {
     const res = await docuStore.changeStatus(
       Number(props.selectedDocument.id),
@@ -222,9 +234,9 @@ const approveAsDean = async () => {
               <Label for="category" class="mb-2"
                 >View your document here:</Label
               >
-              <Button variant="outline"
-                >View Document {{ selectedDocument.file_path }}</Button
-              >
+              <Button variant="outline" @click="viewDocument">
+                View Document
+              </Button>
             </div>
           </div>
         </div>

@@ -132,7 +132,8 @@ class DocumentsController extends Controller implements HasMiddleware
         ], 200);
     }
 
-    public function changeStatus(Request $request, $id){
+    public function changeStatus(Request $request, $id)
+    {
         $fields = $request->validate([
             'status' => 'required|integer|min:0|max:4',
         ]);
@@ -146,5 +147,22 @@ class DocumentsController extends Controller implements HasMiddleware
             'message' => 'Document status updated successfully.',
             'document' => $documents,
         ], 200);
+    }
+
+    public function getFile($id)
+    {
+        $document = Documents::find($id);
+
+        if (!$document) {
+            return response()->json(['error' => 'Document not found'], 404);
+        }
+
+        $filePath = storage_path('app/public/' . $document->file_path);
+
+        if (!file_exists($filePath)) {
+            return response()->json(['error' => 'File not found'], 404);
+        }
+
+        return response()->file($filePath);
     }
 }
