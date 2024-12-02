@@ -40,6 +40,12 @@ const closeDialog = () => {
   console.log("close");
 };
 
+const isAdmin = computed(() => {
+  if (authStore.user) {
+    return authStore.user?.role == "1";
+  }
+});
+
 const { toast } = useToast();
 const isNoTHighUser = computed(() => {
   if (authStore.user) {
@@ -93,7 +99,7 @@ const viewDocument = async () => {
   if (props.selectedDocument.file_path) {
     const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
     const publicFileUrl = `${apiUrl}/storage/${props.selectedDocument.file_path}`;
-  
+
     window.open(publicFileUrl, "_blank");
   } else {
     toast({
@@ -179,7 +185,7 @@ const approveAsDean = async () => {
     :default-value="currentStep"
     :class="[
       'flex gap-2 m-auto w-full max-w-[32rem]',
-      isNoTHighUser ? 'py-5' : 'py-40',
+      isNoTHighUser ? 'py-5' : 'py-20',
     ]"
   >
     <StepperItem
@@ -210,6 +216,43 @@ const approveAsDean = async () => {
       </div>
     </StepperItem>
   </StepperRoot>
+
+  <div v-if="isAdmin" class="mt-12">
+    <Separator class="my-4" label="Documents Information" />
+    <div class="flex flex-col items-center justify-center">
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-col">
+          <Label for="name" class="mb-2">Name</Label>
+          <Input readonly v-model="selectedDocument.name" />
+        </div>
+        <div class="flex flex-col">
+          <Label for="category" class="mb-2">Category</Label>
+          <Input readonly v-model="selectedDocument.category" />
+        </div>
+      </div>
+      <Label for="category" class="mt-3 mb-2">View your document here:</Label>
+      <Button
+        variant="outline"
+        @click="viewDocument"
+        class="bg-grass11 text-white hover:bg-green-700 hover:text-white focus:ring-4 focus:ring-green-300 rounded-md py-2 px-4 flex items-center"
+      >
+        <svg
+          class="w-5 h-5 mr-2"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M9 3a1 1 0 011 1v7.586l3.707-3.707a1 1 0 111.414 1.414l-5 5a1 1 0 01-1.414 0l-5-5a1 1 0 111.414-1.414L8 11.586V4a1 1 0 011-1z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        Download Document
+      </Button>
+    </div>
+  </div>
 
   <div v-if="isNoTHighUser" class="custom-m">
     <Separator class="my-4" label="Documents Information" />
