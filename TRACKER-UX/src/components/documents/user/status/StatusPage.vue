@@ -277,8 +277,25 @@ const approveAsDean = async () => {
               <Label for="category" class="mb-2"
                 >View your document here:</Label
               >
-              <Button variant="outline" @click="viewDocument">
-                View Document
+              <Button
+                variant="outline"
+                @click="viewDocument"
+                class="bg-grass11 text-white hover:bg-green-700 hover:text-white focus:ring-4 focus:ring-green-300 rounded-md py-2 px-4 flex items-center"
+              >
+                <svg
+                  class="w-5 h-5 mr-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M9 3a1 1 0 011 1v7.586l3.707-3.707a1 1 0 111.414 1.414l-5 5a1 1 0 01-1.414 0l-5-5a1 1 0 111.414-1.414L8 11.586V4a1 1 0 011-1z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Download Document
               </Button>
             </div>
           </div>
