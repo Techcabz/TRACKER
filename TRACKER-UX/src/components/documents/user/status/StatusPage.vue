@@ -230,7 +230,7 @@ const approveAsDean = async () => {
           <Input readonly v-model="selectedDocument.category" />
         </div>
       </div>
-      <Label for="category" class="mt-3 mb-2">View your document here:</Label>
+      <Label for="category" class="mt-3 mb-2">View  document here:</Label>
       <Button
         variant="outline"
         @click="viewDocument"
@@ -275,7 +275,7 @@ const approveAsDean = async () => {
           <div class="flex flex-col gap-2 w-full">
             <div class="flex flex-col">
               <Label for="category" class="mb-2"
-                >View your document here:</Label
+                >View document here:</Label
               >
               <Button
                 variant="outline"
