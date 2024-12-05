@@ -36,7 +36,6 @@ const position = ref("");
 onMounted(() => {
   authStore.getUser();
 
-  console.log(authStore.user.personalDetails.position);
   username.value = authStore.user.username || "";
   email.value = authStore.user.email || "";
   status.value =

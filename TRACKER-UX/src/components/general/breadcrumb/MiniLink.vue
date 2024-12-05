@@ -12,28 +12,25 @@ import { computed } from "vue";
 
 const route = useRoute();
 
-// Define the maximum number of breadcrumbs to display
-const maxBreadcrumbs = 3; // Adjust this as needed
+const maxBreadcrumbs = 3; 
 
-// Compute breadcrumbs based on matched routes
 const breadcrumbs = computed(() => {
   const matchedRoutes = route.matched.map((matchedRoute) => {
     const breadcrumb = matchedRoute.meta.breadcrumb;
     return {
       label: typeof breadcrumb === "function" ? breadcrumb(route) : breadcrumb,
-      path: matchedRoute.path !== "/" ? matchedRoute.path : null, // Exclude the base path
+      path: matchedRoute.path !== "/" ? matchedRoute.path : null, 
     };
   });
 
-  // Prepend the static "Dashboard" breadcrumb
   const dashboardBreadcrumb = { label: "Dashboard", path: "/dashboard" };
 
-  // Handle truncation for long breadcrumb paths
+ 
   if (matchedRoutes.length > maxBreadcrumbs - 1) {
     return [
       dashboardBreadcrumb,
-      { label: "...", path: null }, // Ellipsis for truncated middle paths
-      ...matchedRoutes.slice(-1), // Always include the last breadcrumb
+      { label: "...", path: null },
+      ...matchedRoutes.slice(-1), 
     ];
   }
 

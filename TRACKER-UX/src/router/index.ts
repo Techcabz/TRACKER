@@ -70,49 +70,17 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach(async (to, from, next) => {
-//   const loggedIn = isLoggedIn();
-//   const authStore = useAuthStore();
-
-//   // Skip checks for the login route or when explicitly navigating to it
-//   if (to.name === "login") {
-//     return next();
-//   }
-
-//   // Ensure user info is fetched if logged in
-//   if (loggedIn && !authStore.user) {
-//     await authStore.getUser();
-//   }
-
-//   if (to.meta.requiresAuth && !loggedIn) {
-//     return next({ name: "login" });
-//   }
-
-//   if (to.meta.guestOnly && loggedIn) {
-//     return next({ name: "dashboard" });
-//   }
-
-//   const userRole = authStore.userRole;
-//   const allowedRoutes = roleAccess[userRole] || [];
-
-//   if (!allowedRoutes.includes(to.name as string)) {
-//     return next({ name: "dashboard" });
-//   }
-
-//   next();
-// });
-
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _, next) => {
   const loggedIn = isLoggedIn();
   const authStore = useAuthStore();
 
-  // Skip checks for the login route or when explicitly navigating to it
+  
   if (to.name === "login" || to.name === "register") {
     // If logged in, redirect to dashboard instead of allowing login/register
     if (loggedIn) {
       return next({ name: "dashboard" });
     }
-    return next(); // Allow navigating to login/register if not logged in
+    return next(); 
   }
 
   // Ensure user info is fetched if logged in
@@ -139,7 +107,6 @@ router.beforeEach(async (to, from, next) => {
     return next({ name: "dashboard" });
   }
 
-  // Proceed with the navigation
   next();
 });
 
