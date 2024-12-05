@@ -5,7 +5,7 @@ Run git clone
 
 1. Run composer install
 2. Run cp .env.example .env
-3. Configure for database name and smpt credentials in .env
+3. Configure for database name 
 4. Run php artisan key:generate
 5. Run php artisan migrate
 6. Run php artisan serve
