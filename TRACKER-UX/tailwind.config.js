@@ -1,5 +1,5 @@
-const animate = require("tailwindcss-animate")
-const { mauve, green, grass, blackA, red } = require('@radix-ui/colors')
+import animate from "tailwindcss-animate";
+import { mauve, green, grass, blackA, red } from '@radix-ui/colors';
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
