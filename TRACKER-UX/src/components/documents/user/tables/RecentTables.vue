@@ -135,7 +135,7 @@ const columns: ColumnDef<Documents>[] = [
       );
     },
     cell: ({ row }) => {
-      const status = row.getValue("status");
+      const status = row.getValue("status") as 0 | 1 | 2 | 3 | 4;
       const statusString = statusMap[status] || "Unknown";
       const badgeVariant = statusBadgeMap[statusString] || "gray";
       return h(

@@ -39,7 +39,6 @@ const register = async () => {
         class: "bg-green-500 text-white",
       });
 
-      // Reset form fields
       formData.username = "";
       formData.email = "";
       formData.fname = "";
