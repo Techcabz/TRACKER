@@ -45,7 +45,7 @@ const uploadFile = async () => {
     formDataToSend.append("category", formData.category);
     formDataToSend.append("file", formData.file);
 
-    const response = await docuStore.uploadDocument(formDataToSend);
+    await docuStore.uploadDocument(formDataToSend);
 
     toast({
       description: "Uploaded successfully.",

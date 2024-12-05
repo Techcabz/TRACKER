@@ -85,12 +85,12 @@ const filteredDocuments = computed(() => {
   );
 });
 
-const selectedDocu = computed(() =>
-  document.value.find((document) => document.id === selectedDocuId.value)
-);
+// const selectedDocu = computed(() =>
+//   document.value.find((document) => document.id === selectedDocuId.value)
+// );
 
-const isDialogOpen = ref(false);
-const selectedDocuId = ref<string>();
+// const isDialogOpen = ref(false);
+// const selectedDocuId = ref<string>();
 
 const columns: ColumnDef<Documents>[] = [
   {

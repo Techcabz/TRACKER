@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import DocuDialog from "@/components/documents/user/dialog/DocuDialog.vue";
+
 import DocumentFilter from "@/components/documents/user/filters/DocumentFilter.vue";
-import DocuUpload from "@/components/documents/user/form/DocuUpload.vue";
-import Button from "@/components/ui/button/Button.vue";
+
 import Separator from "@/components/ui/separator/Separator.vue";
 import AdminLayouts from "@/layouts/AdminLayouts.vue";
 import { useDocuStore } from "@/stores/document";
@@ -11,7 +10,7 @@ const docuStore = useDocuStore();
 import DocuHistory from "@/components/documents/user/tables/DocuHistory.vue";
 import MiniLink from "@/components/general/breadcrumb/MiniLink.vue";
 import { useAuthStore } from "@/stores/auth";
-import { onMounted, ref, computed, watch } from "vue";
+import { onMounted, ref, computed } from "vue";
 import DocuTables from "@/components/documents/user/tables/DocuTables.vue";
 import HDocuTables from "@/components/documents/huser/DocuTables.vue";
 

@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import CustomDialog from "@/components/general/dialog/CustomDialog.vue";
+
 import {
   Table,
   TableBody,
@@ -84,11 +84,11 @@ const filteredDocuments = computed(() => {
   );
 });
 
-const selectedDocument = computed(() =>
-  documents.value.find((document) => document.id === selectedDocuId.value)
-);
+// const selectedDocument = computed(() =>
+//   documents.value.find((document) => document.id === selectedDocuId.value)
+// );
 
-const selectedDocuId = ref<string>();
+// const selectedDocuId = ref<string>();
 
 const columns: ColumnDef<Documents>[] = [
   {

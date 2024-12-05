@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
 import {
   Select,
   SelectContent,
@@ -41,36 +41,36 @@ import {
 import { CheckIcon, CircleIcon, DotIcon } from "@radix-icons/vue";
 import * as z from "zod";
 
-const { errors } = storeToRefs(useAuthStore());
+// const { errors } = storeToRefs(useAuthStore());
 const authStore = useAuthStore();
 const { toast } = useToast();
 
-const register = async () => {
-  try {
-    const res = await authStore.register(formData);
+// const register = async () => {
+//   try {
+//     const res = await authStore.register(formData);
 
-    if (res.success) {
-      toast({
-        description: "Registration successful. Please wait for admin approval.",
-        class: "bg-green-500 text-white",
-      });
-      formData.username = "";
-      formData.email = "";
-      formData.fname = "";
-      formData.lname = "";
-      formData.position = "";
-      formData.password = "";
-      formData.password_confirmation = "";
-    } else {
-      toast({
-        description: "Registration failed. Please check the errors.",
-        class: "bg-red-500 text-white",
-      });
-    }
-  } catch (error) {
-    console.error("Registration failed:", error);
-  }
-};
+//     if (res.success) {
+//       toast({
+//         description: "Registration successful. Please wait for admin approval.",
+//         class: "bg-green-500 text-white",
+//       });
+//       formData.username = "";
+//       formData.email = "";
+//       formData.fname = "";
+//       formData.lname = "";
+//       formData.position = "";
+//       formData.password = "";
+//       formData.password_confirmation = "";
+//     } else {
+//       toast({
+//         description: "Registration failed. Please check the errors.",
+//         class: "bg-red-500 text-white",
+//       });
+//     }
+//   } catch (error) {
+//     console.error("Registration failed:", error);
+//   }
+// };
 
 const formData = reactive({
   username: "",
