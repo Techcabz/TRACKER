@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useAuthStore } from "@/stores/auth";
-import { storeToRefs } from "pinia";
-import { reactive, h, ref } from "vue";
+// import { useAuthStore } from "@/stores/auth";
+// import { storeToRefs } from "pinia";
+import {  h, ref } from "vue";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast/use-toast";
 import {
@@ -42,7 +42,7 @@ import { CheckIcon, CircleIcon, DotIcon } from "@radix-icons/vue";
 import * as z from "zod";
 
 // const { errors } = storeToRefs(useAuthStore());
-const authStore = useAuthStore();
+// const authStore = useAuthStore();
 const { toast } = useToast();
 
 // const register = async () => {
@@ -72,15 +72,15 @@ const { toast } = useToast();
 //   }
 // };
 
-const formData = reactive({
-  username: "",
-  email: "",
-  fname: "",
-  lname: "",
-  position: "",
-  password: "",
-  password_confirmation: "",
-});
+// const formData = reactive({
+//   username: "",
+//   email: "",
+//   fname: "",
+//   lname: "",
+//   position: "",
+//   password: "",
+//   password_confirmation: "",
+// });
 
 const formSchema = [
   z.object({
